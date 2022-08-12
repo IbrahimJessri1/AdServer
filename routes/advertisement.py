@@ -26,6 +26,7 @@ async def create_ad(ad_input:AdvertisementInput, current_username : TokenData = 
 ############ permission = create_interactive_ad
 @advertisement_router.post('/create_interactive_ad',  status_code=status.HTTP_201_CREATED)
 async def create_interactive_ad(ad_input:InteractiveAdvertisementInput, current_username : TokenData = Depends(oauth2.get_current_user)):
+    return
     Authorize.auth("create_interactive_ad", current_username.username)
     if not Validator.validate(ad_input):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail='make sure of request arguments')

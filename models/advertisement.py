@@ -17,7 +17,7 @@ class Category(str, Enum):
     VEHICLES= "vehicles"
     NATURE= "nature"
     FOOD= "food"
-    SMARTPHONE= "smartphone"
+    SMARTPHONES= "smartphones"
     CARS= "cars"
     PRODUCTS= "products"
     WEBSITES= "websites"
@@ -31,7 +31,7 @@ class Category(str, Enum):
     CLOTHES= "clothes"
     WEARBLE= "wearable"
     ANIMALS= "animals"
-
+    MEDIA= "media"
 
 
 class Language(str, Enum):

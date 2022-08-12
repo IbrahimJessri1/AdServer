@@ -33,7 +33,7 @@ def create_ad(ad_input, advertiser_username):
             if x[0] == ad_input.type:
                 filename += x[1]
                 break
-        download_file(advertisement.ad_info.url, dir, filename)
+       # download_file(advertisement.ad_info.url, dir, filename)
         d = get_dict(advertisement)
         advertisement_collection.insert_one(dict(d))
         return id
@@ -63,7 +63,7 @@ def create_interactive_ad(ad_input : InteractiveAdvertisementInput, advertiser_u
             if x[0] == ad_input.type:
                 filename += x[1]
                 break
-        download_file(advertisement.ad_info.url, dir, filename)
+        #download_file(advertisement.ad_info.url, dir, filename)
         d = get_dict(advertisement)
         interactive_advertisement_collection.insert_one(dict(d))
         return id
