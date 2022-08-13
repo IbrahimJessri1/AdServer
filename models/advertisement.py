@@ -127,4 +127,28 @@ class InteractiveAdvertisement(BaseModel):
     keywords: Optional[List[str]] = None
 
 
+class AdvertisementShow(BaseModel):
+    id: str
+    create_date: str
+    target_user_info: TargetUserInfo
+    marketing_info: MarketingInfo
+    ad_info: AdInfo
+    categories: List[Category]
+    keywords: Optional[List[str]] = None
 
+
+class InteractiveAdvertisementShow(BaseModel):
+    id: str
+    create_date: str
+    target_user_info: TargetUserInfo
+    marketing_info: InteractiveMarketingInfo
+    ad_info: InteractiveAdInfo
+    categories: List[Category]
+    keywords: Optional[List[str]] = None
+
+
+class adLimitedGet(BaseModel):
+    limit: Optional[int] = -1
+    skip: Optional[int] = 0
+    interactive: int = 0
+    constraints : Optional[dict] = {}

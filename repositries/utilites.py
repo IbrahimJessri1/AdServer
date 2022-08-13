@@ -1,5 +1,3 @@
-
-from models.advertisement import Advertisement, Category, MarketingInfo
 from pydantic import BaseModel
 from enum import Enum
 from uuid import UUID
@@ -7,6 +5,7 @@ import random
 from models.ssp import UserInfo
 from models.advertisement import Language, TargetAge
 from repositries import generics as gen
+import requests, os
 
 def get_dict(obj):
     res = {}
@@ -111,3 +110,11 @@ def limited_get(collection , limit, skip, constraints):
     begin = skip
     end = min(count, begin + limit)
     return all_items[begin:end]
+
+
+
+def download_file(URL, dir, filename):
+    os.makedirs(dir, exist_ok=True) 
+    path = dir + "/" + filename
+    response = requests.get(URL)
+    open(path, "wb").write(response.content)

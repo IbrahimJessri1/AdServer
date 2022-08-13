@@ -118,6 +118,7 @@ def negotiate(request : Ad_Request, interactive = 0):
         if interactive != 0:
             if ad["marketing_info"]["impressions"] != 0:
                 ctr = ad["marketing_info"]["clicks"] * 100 / ad["marketing_info"]["impressions"]
+                ctr = min(ctr, 100)
                 all_weights += ctr_weight
                 marks += ctr * ctr_weight
 
@@ -143,16 +144,16 @@ def request(ad_apply : ApplyAd, interactive = 0):
     if interactive != 0:
         ad_collection = interactive_advertisement_collection
     ad = gen.get_one(ad_collection, {"id" : ad_apply.ad_id})
-    if ad_apply.cpc > ad["marketing_info"]["max_cpc"]:
+    if (not ad) or (ad_apply.cpc > ad["marketing_info"]["max_cpc"]):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Ad For U")
-    gen.update_one(ad_collection, {"id" : ad["id"]}, { "$inc": { "marketing_info.impressions": 1 } })
-    served_ad = {"id": str(uuid4()), "agreed_cpc": ad_apply.cpc, "ad_id": ad["id"]}
+    id = str(uuid4())
+    served_ad = {"id": id, "agreed_cpc": ad_apply.cpc, "impressions": 0, "clicks" : 0, "ad_id": ad["id"] }
     served_ad_collection.insert_one(dict(served_ad))
     data = {
-        "url" : ad["ad_info"]["url"],
+        "url" : HOST + 'serve_ad/impression/' + id,
         "text" : ad["ad_info"]["text"]
     }
     ## should be remove cuz id is enough when redirecting
     if interactive != 0:
-        data["redirect_url"] = HOST + 'serve_ad/' + ad["id"]
+        data["redirect_url"] = HOST + 'serve_ad/click/' + id 
     return data

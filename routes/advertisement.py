@@ -2,7 +2,7 @@
 from fastapi import APIRouter, UploadFile, status, HTTPException, UploadFile, File, Depends
 from repositries import oauth2
 from models.token import TokenData
-from models.advertisement import AdvertisementInput, InteractiveAdvertisementInput
+from models.advertisement import AdvertisementInput, InteractiveAdvertisementInput, adLimitedGet
 from repositries import advertisement as repo_advertisement
 from repositries.validation import Validator
 from repositries.authorize import Authorize
@@ -41,10 +41,10 @@ async def get_my_ads(current_username : TokenData = Depends(oauth2.get_current_u
 
 
 #admin
-@advertisement_router.get('/')
-async def get_all(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0, interative : int = 0):
+@advertisement_router.post('/')
+async def get(ad_limited_input : adLimitedGet, current_username : TokenData = Depends(oauth2.get_current_user)):
     Authorize.auth("get_advertisement", current_username.username)
-    return repo_advertisement.get_all(limit=limit, skip=skip, interactive= interative)
+    return repo_advertisement.get(ad_limited_input.constraints, limit=ad_limited_input.limit, skip=ad_limited_input.skip, interactive= ad_limited_input.interactive)
 
 
 @advertisement_router.delete('/', status_code=status.HTTP_204_NO_CONTENT)
@@ -52,6 +52,10 @@ async def remove(constraints : dict, current_username : TokenData = Depends(oaut
     Authorize.auth("delete_advertisement", current_username.username)
     repo_advertisement.remove(constraints)
 
+@advertisement_router.get('/{id}')
+async def get_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("self_get_ad", current_username.username)
+    return repo_advertisement.get_ad(id, current_username.username)
 
 
 

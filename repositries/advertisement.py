@@ -1,17 +1,11 @@
-from gc import collect
-from pydoc import cli
-import shutil
-from tempfile import gettempdir
+from os import stat
 from uuid import uuid4
 from fastapi import HTTPException, status
 from config.db import advertisement_collection, interactive_advertisement_collection
 from repositries import generics as gen
-from models.advertisement import AdInfo, Advertisement, InteractiveAdvertisementInput, MarketingInfo, InteractiveAdInfo, InteractiveAdvertisement, InteractiveMarketingInfo, AdType
+from models.advertisement import AdInfo, Advertisement, AdvertisementShow, InteractiveAdvertisementInput, MarketingInfo, InteractiveAdInfo, InteractiveAdvertisement, InteractiveMarketingInfo, AdType, InteractiveAdvertisementShow
 import datetime
-from .utilites import get_dict, limited_get
-import requests
-import os
-
+from .utilites import get_dict, limited_get, download_file
 
 
 def create_ad(ad_input, advertiser_username):
@@ -75,14 +69,20 @@ def get_my_ads(username, limit, skip, interactive):
     collection = advertisement_collection
     if interactive:
         collection = interactive_advertisement_collection
-    return limited_get(collection=collection, limit=limit, skip=skip, constraints= {"ad_info.advertiser_username" : username})
-
+    res =  limited_get(collection=collection, limit=limit, skip=skip, constraints= {"ad_info.advertiser_username" : username})
+    ads = []
+    for ad in res:
+        if interactive:
+            ads.append(toAdShow(ad, 1))
+        else:
+            ads.append(toAdShow(ad))
+    return ads
 ##admin uses
-def get_all(limit, skip, interactive):
+def get(constraints, limit, skip, interactive):
     collection = advertisement_collection
     if interactive:
         collection = interactive_advertisement_collection
-    return limited_get(collection=collection, limit=limit, skip=skip, constraints= {})
+    return limited_get(collection=collection, limit=limit, skip=skip, constraints= constraints)
 
 
 def remove(constraints):
@@ -90,8 +90,38 @@ def remove(constraints):
     
 
 
-def download_file(URL, dir, filename):
-    os.makedirs(dir, exist_ok=True) 
-    path = dir + "/" + filename
-    response = requests.get(URL)
-    open(path, "wb").write(response.content)
+
+
+
+def get_ad(id, username):
+    query = {"$and" : [{"ad_info.advertiser_username" : username}, {"id" : id}]}
+    ad = gen.get_one(advertisement_collection, query)
+    if ad:
+        return toAdShow(ad)
+    ad = gen.get_one(interactive_advertisement_collection, {"$and" : [{"ad_info.advertiser_username" : username}, {"id" : id}]})
+    if ad:
+        return toAdShow(ad, 1)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no such id")
+
+
+
+def toAdShow(ad, interactive = 0):
+    if interactive:
+        return  InteractiveAdvertisementShow(
+                    id= ad["id"],
+                    create_date=ad["create_date"],
+                    target_user_info=ad["target_user_info"],
+                    marketing_info=ad["marketing_info"],
+                    ad_info=ad["ad_info"], 
+                    categories=ad["categories"],
+                    keywords=ad["keywords"]
+                )
+    return  AdvertisementShow(
+                        id= ad["id"],
+                        create_date=ad["create_date"],
+                        target_user_info=ad["target_user_info"],
+                        marketing_info=ad["marketing_info"],
+                        ad_info=ad["ad_info"], 
+                        categories=ad["categories"],
+                        keywords=ad["keywords"]
+            )
