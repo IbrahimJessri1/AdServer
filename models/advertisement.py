@@ -32,7 +32,7 @@ class Category(str, Enum):
     WEARBLE= "wearable"
     ANIMALS= "animals"
     MEDIA= "media"
-
+    JOBS= "jobs"
 
 class Language(str, Enum):
     ANY = "any"

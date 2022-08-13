@@ -1,5 +1,5 @@
 from unicodedata import category
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from enum import Enum
 from typing import Optional, List
 
@@ -26,20 +26,40 @@ class UserInfo(BaseModel):
 
     
 class Category(str, Enum):
-    TECHNOLOGY= "technology"
-
-class Categories(BaseModel):
-    categories_list: List[Category]
-
+    PLACES= "places"
+    Technology= "technology"
+    HEALTHCARE = "healthcare"
+    APPS= "apps"
+    TOYS=  "toys"
+    GAMING= "gaming"
+    EDUCATION = "education"
+    VEHICLES= "vehicles"
+    NATURE= "nature"
+    FOOD= "food"
+    SMARTPHONES= "smartphones"
+    CARS= "cars"
+    PRODUCTS= "products"
+    WEBSITES= "websites"
+    BIKES= "bikes"
+    SCHOOL= "school"
+    BOOKS= "books"
+    ELECTRONICS= "electronics"
+    HOUSE= "house"
+    FURNITURE= "furniture"
+    FAMILY= "family"
+    CLOTHES= "clothes"
+    WEARBLE= "wearable"
+    ANIMALS= "animals"
+    MEDIA = "media"
+    JOBS= "jobs"
 
 
 class Ad_Request(BaseModel):
     min_cpc: float
     user_info: Optional[UserInfo] = None
-    categories: Optional[Categories] = None
+    categories: Optional[List[Category]] = []
     type: AdType
-    keywords: Optional[List[str]] = None
-
+    keywords: Optional[List[str]] = []
 
 class ApplyAd(BaseModel):
     cpc: float

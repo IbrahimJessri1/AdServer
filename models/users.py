@@ -10,10 +10,10 @@ class Membership(str, Enum):
     VIP = "VIP" #0.45
 
 
-class MembershipProbabilities(str, Enum):
-    NORMAL = 0.2
-    PREMIUM = 0.35
-    VIP = 0.45
+class MembershipMarks(str, Enum):
+    NORMAL = 50
+    PREMIUM = 70
+    VIP = 100
 
 
 class Role(str, Enum):
