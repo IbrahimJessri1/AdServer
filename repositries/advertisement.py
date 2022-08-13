@@ -1,3 +1,4 @@
+from gc import collect
 from pydoc import cli
 import shutil
 from tempfile import gettempdir
@@ -7,7 +8,7 @@ from config.db import advertisement_collection, interactive_advertisement_collec
 from repositries import generics as gen
 from models.advertisement import AdInfo, Advertisement, InteractiveAdvertisementInput, MarketingInfo, InteractiveAdInfo, InteractiveAdvertisement, InteractiveMarketingInfo, AdType
 import datetime
-from .utilites import get_dict
+from .utilites import get_dict, limited_get
 import requests
 import os
 
@@ -70,13 +71,18 @@ def create_interactive_ad(ad_input : InteractiveAdvertisementInput, advertiser_u
     except:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail='An error happened, try again later')
 
+def get_my_ads(username, limit, skip, interactive):
+    collection = advertisement_collection
+    if interactive:
+        collection = interactive_advertisement_collection
+    return limited_get(collection=collection, limit=limit, skip=skip, constraints= {"ad_info.advertiser_username" : username})
 
 ##admin uses
-def get_all():
-    return gen.get_many(advertisement_collection, {})
-
-def get_my_ads(username):
-    return gen.get_many(advertisement_collection, {"ad_info.advertiser_username" : username})
+def get_all(limit, skip, interactive):
+    collection = advertisement_collection
+    if interactive:
+        collection = interactive_advertisement_collection
+    return limited_get(collection=collection, limit=limit, skip=skip, constraints= {})
 
 
 def remove(constraints):

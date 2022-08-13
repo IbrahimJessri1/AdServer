@@ -6,6 +6,7 @@ from uuid import UUID
 import random
 from models.ssp import UserInfo
 from models.advertisement import Language, TargetAge
+from repositries import generics as gen
 
 def get_dict(obj):
     res = {}
@@ -97,3 +98,16 @@ def get_weight_user_info(user_info : UserInfo, ad):
     if total_weight == 0:
         return -1
     return weight_gained * 100 / total_weight
+
+
+
+def limited_get(collection , limit, skip, constraints):
+    all_items = gen.get_many(collection, constraints)
+    count = len(all_items) 
+    if skip > count:
+        return []
+    if limit == -1:
+        limit = count
+    begin = skip
+    end = min(count, begin + limit)
+    return all_items[begin:end]

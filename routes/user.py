@@ -15,9 +15,9 @@ user_router = APIRouter(
 #update
 
 @user_router.get('/all')
-async def get(current_username : TokenData = Depends(oauth2.get_current_user)):
+async def get(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0, role : str = None):
     Authorize.auth("get_user", current_username.username)
-    return repo_user.get_all()
+    return repo_user.get_all(limit=limit, skip=skip, role= role)
 
 
 @user_router.delete('/remove', status_code=status.HTTP_204_NO_CONTENT)

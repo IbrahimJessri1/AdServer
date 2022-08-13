@@ -1,17 +1,19 @@
+from asyncio import constants
 from config.db import user_collection
 from models.users import UserShow
 from repositries import generics as gen
+from .utilites import limited_get
 from .hashing import Hash
 from fastapi import HTTPException, status
 
-def get_all():
-    return gen.get_many(user_collection, {})
+def get_all(limit, skip, role):
+    if role:
+        constraints = {"role" : role}
+    return limited_get(user_collection, limit=limit, skip=skip,constraints=constraints)
 
 
 def remove(constraints):
     gen.remove(user_collection, constraints)
-
-
 
 
 

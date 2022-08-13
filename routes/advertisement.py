@@ -34,17 +34,17 @@ async def create_interactive_ad(ad_input:InteractiveAdvertisementInput, current_
 
 
 @advertisement_router.get('/my_ads')
-async def get_my_ads(current_username : TokenData = Depends(oauth2.get_current_user)):
+async def get_my_ads(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0, interative : int = 0):
     Authorize.auth("self_get_ad", current_username.username)
-    return repo_advertisement.get_my_ads(current_username.username)
+    return repo_advertisement.get_my_ads(username= current_username.username, limit=limit, skip=skip, interactive= interative)
 
 
 
 #admin
 @advertisement_router.get('/')
-async def get_all(current_username : TokenData = Depends(oauth2.get_current_user)):
+async def get_all(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0, interative : int = 0):
     Authorize.auth("get_advertisement", current_username.username)
-    return repo_advertisement.get_all()
+    return repo_advertisement.get_all(limit=limit, skip=skip, interactive= interative)
 
 
 @advertisement_router.delete('/', status_code=status.HTTP_204_NO_CONTENT)

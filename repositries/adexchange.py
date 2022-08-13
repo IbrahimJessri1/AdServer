@@ -9,7 +9,7 @@ from models.ssp import ApplyAd
 from uuid import uuid4
 from .utilites import get_weight_user_info
 from fastapi import status, HTTPException
-
+from config.general import HOST
 
 cat_weight = 1
 keyword_weight = 1
@@ -143,6 +143,8 @@ def request(ad_apply : ApplyAd, interactive = 0):
     if interactive != 0:
         ad_collection = interactive_advertisement_collection
     ad = gen.get_one(ad_collection, {"id" : ad_apply.ad_id})
+    if ad_apply.cpc > ad["marketing_info"]["max_cpc"]:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Ad For U")
     gen.update_one(ad_collection, {"id" : ad["id"]}, { "$inc": { "marketing_info.impressions": 1 } })
     served_ad = {"id": str(uuid4()), "agreed_cpc": ad_apply.cpc, "ad_id": ad["id"]}
     served_ad_collection.insert_one(dict(served_ad))
@@ -152,5 +154,5 @@ def request(ad_apply : ApplyAd, interactive = 0):
     }
     ## should be remove cuz id is enough when redirecting
     if interactive != 0:
-        data["redirect_url"] = ad["ad_info"]["redirect_url"]
+        data["redirect_url"] = HOST + 'serve_ad/' + ad["id"]
     return data
