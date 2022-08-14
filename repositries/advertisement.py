@@ -1,7 +1,8 @@
 from os import stat
 from uuid import uuid4
 from fastapi import HTTPException, status
-from config.db import advertisement_collection, interactive_advertisement_collection
+from config.db import advertisement_collection, interactive_advertisement_collection, served_ad_collection
+from models.ads_stats import ServedAd
 from repositries import generics as gen
 from models.advertisement import AdInfo, Advertisement, AdvertisementShow, InteractiveAdvertisementInput, MarketingInfo, InteractiveAdInfo, InteractiveAdvertisement, InteractiveMarketingInfo, AdType, InteractiveAdvertisementShow
 import datetime
@@ -65,6 +66,7 @@ def create_interactive_ad(ad_input : InteractiveAdvertisementInput, advertiser_u
     except:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail='An error happened, try again later')
 
+
 def get_my_ads(username, limit, skip, interactive):
     collection = advertisement_collection
     if interactive:
@@ -77,6 +79,17 @@ def get_my_ads(username, limit, skip, interactive):
         else:
             ads.append(toAdShow(ad))
     return ads
+
+
+def get_my_served_ads(username, limit, skip):
+    res =  limited_get(collection=served_ad_collection, limit=limit, skip=skip, constraints= {"advertiser_username" : username})
+    ads = []
+    for ad in res:
+        ads.append(toServedAd(ad))
+    return ads
+
+
+
 ##admin uses
 def get(constraints, limit, skip, interactive):
     collection = advertisement_collection
@@ -104,6 +117,13 @@ def get_ad(id, username):
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no such id")
 
 
+def get_served_ad(id, username):
+    query = {"$and" : [{"advertiser_username" : username}, {"id" : id}]}
+    ad = gen.get_one(served_ad_collection, query)
+    if ad:
+        return toAdShow(ad)
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no such id")
+
 
 def toAdShow(ad, interactive = 0):
     if interactive:
@@ -125,3 +145,29 @@ def toAdShow(ad, interactive = 0):
                         categories=ad["categories"],
                         keywords=ad["keywords"]
             )
+
+
+def toServedAd(served_ad):
+    return ServedAd(
+        id= served_ad["id"],
+        agreed_cpc=served_ad["agreed_cpc"], 
+        ad_id=served_ad["ad_id"], 
+        impressions=served_ad["impressions"], 
+        clicks=served_ad["clicks"]
+        )
+
+
+def get_tot_payment(username):
+    tot = 0
+    res = gen.get_many(served_ad_collection, {"advertiser_username" : username})
+    for item in res:
+        tot += int(item["clicks"]) * int(item["agreed_cpc"])
+    return {"total" : tot}
+
+
+def get_ad_payment(username, ad_id):
+    tot = 0
+    res = gen.get_many(served_ad_collection, {"$and" : [{"advertiser_username" : username}, {"ad_id" : ad_id}]})
+    for item in res:
+        tot += int(item["clicks"]) * int(item["agreed_cpc"])
+    return {"total" : tot}

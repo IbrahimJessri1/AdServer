@@ -52,10 +52,33 @@ async def remove(constraints : dict, current_username : TokenData = Depends(oaut
     Authorize.auth("delete_advertisement", current_username.username)
     repo_advertisement.remove(constraints)
 
+@advertisement_router.get('/my_served_ads')
+async def get_my_served_ads(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0):
+    Authorize.auth("self_get_served_ad", current_username.username)
+    return repo_advertisement.get_my_served_ads(username= current_username.username, limit=limit, skip=skip)
+
+
+@advertisement_router.get('/my_served_ad/{id}')
+async def get_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("self_get_served_ad", current_username.username)
+    return repo_advertisement.get_served_ad(id, current_username.username)
+
+@advertisement_router.get('/total_payment/')
+async def get_ad(current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("self_get_tot_payment", current_username.username)
+    return repo_advertisement.get_tot_payment(current_username.username)
+
+@advertisement_router.get('/total_payment/{id}')
+async def get_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("self_get_ad_payment", current_username.username)
+    return repo_advertisement.get_ad_payment(current_username.username, id)
+
+
 @advertisement_router.get('/{id}')
 async def get_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
     Authorize.auth("self_get_ad", current_username.username)
     return repo_advertisement.get_ad(id, current_username.username)
+
 
 
 
