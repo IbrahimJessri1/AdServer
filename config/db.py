@@ -20,6 +20,3 @@ served_ad_collection = conn.AdServer.served_ad
 
 #print(all_ads[0]["marketing_info"]["max_cpc"])
 
-
-
-

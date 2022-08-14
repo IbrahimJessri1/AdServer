@@ -121,7 +121,7 @@ def get_served_ad(id, username):
     query = {"$and" : [{"advertiser_username" : username}, {"id" : id}]}
     ad = gen.get_one(served_ad_collection, query)
     if ad:
-        return toAdShow(ad)
+        return toServedAd(ad)
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="no such id")
 
 
@@ -153,7 +153,8 @@ def toServedAd(served_ad):
         agreed_cpc=served_ad["agreed_cpc"], 
         ad_id=served_ad["ad_id"], 
         impressions=served_ad["impressions"], 
-        clicks=served_ad["clicks"]
+        clicks=served_ad["clicks"],
+        advertiser_username=served_ad["advertiser_username"]
         )
 
 
@@ -161,7 +162,7 @@ def get_tot_payment(username):
     tot = 0
     res = gen.get_many(served_ad_collection, {"advertiser_username" : username})
     for item in res:
-        tot += int(item["clicks"]) * int(item["agreed_cpc"])
+        tot += int(item["clicks"]) * float(item["agreed_cpc"])
     return {"total" : tot}
 
 
@@ -169,5 +170,5 @@ def get_ad_payment(username, ad_id):
     tot = 0
     res = gen.get_many(served_ad_collection, {"$and" : [{"advertiser_username" : username}, {"ad_id" : ad_id}]})
     for item in res:
-        tot += int(item["clicks"]) * int(item["agreed_cpc"])
+        tot += int(item["clicks"]) * float(item["agreed_cpc"])
     return {"total" : tot}
