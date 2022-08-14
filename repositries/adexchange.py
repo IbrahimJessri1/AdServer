@@ -53,7 +53,7 @@ def negotiate(request : Ad_Request, interactive = 0):
 
     mx_times_served = 0
     mx_raise_amount = 0
-    
+    mx_ctr = 0
     for index in range(len(all_ads)):
         ad = all_ads[index]
         mx_times_served = max(ad["marketing_info"]["impressions"], mx_times_served)
@@ -61,8 +61,10 @@ def negotiate(request : Ad_Request, interactive = 0):
         diff = (ad["marketing_info"]["max_cpc"] - request.min_cpc)
         actual_raise = max(min(ad["marketing_info"]["max_cpc"] - request.min_cpc, request.min_cpc * raise_percentage), rand(diff * 0.2, diff * 0.3, 3))
         mx_raise_amount = max(actual_raise, mx_raise_amount)
+        if interactive and ad["marketing_info"]["impressions"] != 0:
+            mx_ctr = max(mx_ctr, ad["marketing_info"]["clicks"] / ad["marketing_info"]["impressions"])
         final_ad_list.append([index, 0, actual_raise])
-
+    
     for i in range(len(all_ads)):
         all_weights = 0
         marks = 0
@@ -116,12 +118,12 @@ def negotiate(request : Ad_Request, interactive = 0):
         marks += int(membership_gained_marks) * membership_weight
 
         if interactive != 0:
+            all_weights += ctr_weight
             if ad["marketing_info"]["impressions"] != 0:
-                ctr = ad["marketing_info"]["clicks"] * 100 / ad["marketing_info"]["impressions"]
-                ctr = min(ctr, 100)
-                all_weights += ctr_weight
+                ctr = ad["marketing_info"]["clicks"]  / ad["marketing_info"]["impressions"]
+                if mx_ctr != 0:
+                    ctr = ctr * 100 / mx_ctr
                 marks += ctr * ctr_weight
-
         final_weight = 0
         if all_weights != 0:
             final_weight = marks / all_weights
@@ -153,7 +155,6 @@ def request(ad_apply : ApplyAd, interactive = 0):
         "url" : HOST + 'serve_ad/impression/' + id,
         "text" : ad["ad_info"]["text"]
     }
-    ## should be remove cuz id is enough when redirecting
     if interactive != 0:
         data["redirect_url"] = HOST + 'serve_ad/click/' + id 
     return data

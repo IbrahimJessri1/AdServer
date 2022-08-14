@@ -4,7 +4,7 @@ from models.ssp import Ad_Request
 from models.ssp import ApplyAd
 from repositries import serve_ads as repo_serve
 from fastapi.responses import RedirectResponse
-
+from fastapi.requests import Request
 
 serve_ads_router = APIRouter(
     prefix="/serve_ad",
