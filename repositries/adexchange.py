@@ -133,12 +133,13 @@ def negotiate(request : Ad_Request, interactive = 0):
     final_ad_list.sort(key= lambda x : x[1], reverse= True)
     winner_ad = all_ads[final_ad_list[0][0]]
     #return {"cpc": final_ad_list[0][1], "ad_id": winner_ad["id"]}
-    print(final_ad_list[0][1])
     if final_ad_list[0][1] <50:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "No Ads For U")
     # print(final_ad_list[0])
     # print(winner_ad)
-    return {"cpc": final_ad_list[0][2], "ad_id": winner_ad["id"]}
+    res = {"cpc": final_ad_list[0][2], "weight":final_ad_list[0][1],  "ad_id": winner_ad["id"]}
+    print(res)
+    return res
     
 
 
