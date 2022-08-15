@@ -40,3 +40,20 @@ async def request(request : ApplyAd):
     if val_res:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= val_res)
     return repo_adexchange.request(request, 1)
+
+
+
+
+@adexchange_router.post('/request/HTML')
+async def request(request : ApplyAd):
+    val_res = Validator.validate_ad_apply(request)
+    if val_res:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= val_res)
+    return repo_adexchange.request_html(request)
+
+@adexchange_router.post('/request_interactive/HTML')
+async def request(request : ApplyAd):
+    val_res = Validator.validate_ad_apply(request)
+    if val_res:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= val_res)
+    return repo_adexchange.request_html(request, 1)
