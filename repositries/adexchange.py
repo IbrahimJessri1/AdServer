@@ -20,12 +20,12 @@ keyword_weight = 1
 
 
 user_info_weight = 10
-categories_weight = 38
+categories_weight = 40
 keywords_weight = 50
-ctr_weight = 7
-pay_weight = 7
-membership_weight = 7
-times_served_weight = 5
+ctr_weight = 0
+pay_weight = 0
+membership_weight = 0
+times_served_weight = 0
 
 def negotiate(request : Ad_Request, interactive = 0):
 
@@ -102,6 +102,10 @@ def negotiate(request : Ad_Request, interactive = 0):
         if kw_tot_marks != 0:
             all_weights += keywords_weight
             marks += (kw_gained_marks * 100 / kw_tot_marks) * keywords_weight
+            # if ad["id"] == "17da25c1-738e-42e1-b531-3f3973d75209":
+            #     print((kw_gained_marks * 100 / kw_tot_marks) , " keywords " , "gaming")
+            # if ad["id"] == "02fba90c-959e-459d-9966-7f2d24ad980d":
+            #     print((kw_gained_marks * 100 / kw_tot_marks) , " keywords ", "furn")
 
         if mx_times_served != 0:
             all_weights += times_served_weight
@@ -131,7 +135,10 @@ def negotiate(request : Ad_Request, interactive = 0):
         final_weight = 0
         if all_weights != 0:
             final_weight = marks / all_weights
-
+        # if ad["id"] == "17da25c1-738e-42e1-b531-3f3973d75209":
+        #     print(final_weight, " " , "gaming")
+        # if ad["id"] == "02fba90c-959e-459d-9966-7f2d24ad980d":
+        #     print(final_weight, " ", "furn")
         final_ad_list[i] = [i, final_weight, final_ad_list[i][2] + request.min_cpc]
 
     final_ad_list.sort(key= lambda x : x[1], reverse= True)
@@ -161,6 +168,28 @@ def request(ad_apply : ApplyAd, interactive = 0):
         "url" : HOST + 'serve_ad/impression/' + id,
         "text" : ad["ad_info"]["text"]
     }
+    width = ad["ad_info"]["width"]
+    height = ad["ad_info"]["height"]
+    ratio = width / height
+    if ad_apply.max_width != 0 and ad_apply.max_height == 0:
+        width = min(width, ad_apply.max_width)
+        height = int(width / ratio)
+    elif ad_apply.max_width == 0 and ad_apply.max_height != 0:
+        height = min(height, ad_apply.max_height)
+        width = int(height * ratio)
+    elif ad_apply.max_width != 0 and ad_apply.max_height != 0:
+        max_width = int(min(ad_apply.max_height, height) * ratio)
+        if max_width <= ad_apply.max_width:
+            width = max_width
+            height = int(width / ratio)
+        else:
+            height = int(min(ad_apply.max_width,width) / ratio)
+            width = int(height * ratio)
+
+    data["width"] = width
+    data["height"] = height
+    data["text_font_size"] =int((13/275) * (width+height)/2)
+    data["text_margin_top"] = int((13/275) * (width+height)/2)
     if interactive != 0:
         data["redirect_url"] = HOST + 'serve_ad/click/' + id 
     return data

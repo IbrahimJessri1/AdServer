@@ -23,6 +23,10 @@ class Validator:
                 msg.append("too many keywords")
         if not Validator.validate_url(ad_input.url):
             msg.append("url is not valid")
+        if ad_input.width < 5:
+            msg.append("width must be greater than 5px")
+        if ad_input.height < 5:
+            msg.append("height must be greater than 5px")
         if msg:
             return msg
         return False
@@ -44,6 +48,10 @@ class Validator:
             msg.append("url is not valid")
         if not Validator.validate_url(ad_input.redirect_url):
             msg.append("redirect_url is not valid")
+        if ad_input.width < 5:
+            msg.append("width must be greater than 5px")
+        if ad_input.height < 5:
+            msg.append("height must be greater than 5px")
         if msg:
             return msg
         return False
