@@ -19,3 +19,8 @@ served_ad_collection = conn.AdServer.served_ad
 
 
 #print(all_ads[0]["marketing_info"]["max_cpc"])
+
+
+# advertisement_collection.delete_many({})
+# interactive_advertisement_collection.delete_many({})
+# served_ad_collection.delete_many({})

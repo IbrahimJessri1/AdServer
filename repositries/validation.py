@@ -2,7 +2,7 @@
 from models.advertisement import AdvertisementInput, InteractiveAdvertisementInput
 from models.ssp import Ad_Request, ApplyAd
 from models.users import Advertiser, AdvertiserUpdate, UserUpdate
-import requests
+import requests, validators
 
 MAX_KEYWORDS = 20
 
@@ -95,12 +95,18 @@ class Validator:
         msg = []
         if apply_ad.cpc < 0:
             msg.append("cpc must be positive")
+        if len(apply_ad.payment_account) == 0:
+            msg.append("payment_account must not be empty")
         if msg:
             return msg
         return False
 
+    # def validate_url(url):
+    #     try:
+    #         return requests.head(url).status_code < 400
+    #     except:
+    #         return False
+
     def validate_url(url):
-        try:
-            return requests.head(url).status_code < 400
-        except:
-            return False
+        return True
+        return validators.url(url)

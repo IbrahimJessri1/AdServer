@@ -64,3 +64,4 @@ class Ad_Request(BaseModel):
 class ApplyAd(BaseModel):
     cpc: float
     ad_id: str
+    payment_account:str

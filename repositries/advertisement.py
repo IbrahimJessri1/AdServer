@@ -12,7 +12,7 @@ from .utilites import get_dict, limited_get, download_file
 def create_ad(ad_input, advertiser_username):
     try:
         create_date = str(datetime.datetime.now())
-        ad_info = AdInfo(type = ad_input.type, advertiser_username=advertiser_username, url=ad_input.url, text=ad_input.text)
+        ad_info = AdInfo(type = ad_input.type, advertiser_username=advertiser_username, url=ad_input.url, text=ad_input.text,  width=ad_input.width, height=ad_input.height)
         id = str(uuid4())
         advertisement = Advertisement(
             id= id,
@@ -41,7 +41,7 @@ def create_ad(ad_input, advertiser_username):
 def create_interactive_ad(ad_input : InteractiveAdvertisementInput, advertiser_username):
     try:
         create_date = str(datetime.datetime.now())
-        ad_info = InteractiveAdInfo(type = ad_input.type, advertiser_username=advertiser_username, url=ad_input.url, redirect_url= ad_input.redirect_url, text=ad_input.text)
+        ad_info = InteractiveAdInfo(type = ad_input.type, advertiser_username=advertiser_username, url=ad_input.url, redirect_url= ad_input.redirect_url, text=ad_input.text, width=ad_input.width, height=ad_input.height)
         id = uuid4()
         advertisement = InteractiveAdvertisement(
             id = str(id),
@@ -52,13 +52,13 @@ def create_interactive_ad(ad_input : InteractiveAdvertisementInput, advertiser_u
             categories=ad_input.categories,
             keywords=ad_input.keywords
         )
-        filenames = [(AdType.TEXT, '.txt'), (AdType.IMAGE, '.jpg'), (AdType.VIDEO, '.mp4')]
-        dir = 'advertisements/' + advertiser_username
-        filename = str(advertisement.id)
-        for x in filenames:
-            if x[0] == ad_input.type:
-                filename += x[1]
-                break
+        # filenames = [(AdType.TEXT, '.txt'), (AdType.IMAGE, '.jpg'), (AdType.VIDEO, '.mp4')]
+        # dir = 'advertisements/' + advertiser_username
+        # filename = str(advertisement.id)
+        # for x in filenames:
+        #     if x[0] == ad_input.type:
+        #         filename += x[1]
+        #         break
         #download_file(advertisement.ad_info.url, dir, filename)
         d = get_dict(advertisement)
         interactive_advertisement_collection.insert_one(dict(d))

@@ -58,7 +58,6 @@ class TargetUserInfo(BaseModel):
     language: Language
 
 class AdType(str, Enum):
-    TEXT= "text"
     IMAGE= "image"
     VIDEO= "video"
 
@@ -67,6 +66,8 @@ class AdInfo(BaseModel):
     advertiser_username: str
     url: str
     text: str
+    width: int
+    height: int
 
 class InteractiveAdInfo(BaseModel):
     type : AdType
@@ -74,6 +75,8 @@ class InteractiveAdInfo(BaseModel):
     url: str
     redirect_url : str
     text: str
+    width: int
+    height: int
 
 class MarketingInfo(BaseModel):
     max_cpc : float
@@ -96,6 +99,8 @@ class AdvertisementInput(BaseModel):
     raise_percentage: float
     keywords: Optional[List[str]] = None
     text: str
+    width: int
+    height: int
 
 class InteractiveAdvertisementInput(BaseModel):
     target_user_info: TargetUserInfo
@@ -107,6 +112,9 @@ class InteractiveAdvertisementInput(BaseModel):
     raise_percentage: float
     keywords: Optional[List[str]] = None
     text: str
+    width:int
+    height:int 
+
 
 class Advertisement(BaseModel):
     id:Optional[UUID] = uuid4()
@@ -125,7 +133,7 @@ class InteractiveAdvertisement(BaseModel):
     ad_info: InteractiveAdInfo
     categories: List[Category]
     keywords: Optional[List[str]] = None
-
+    
 
 class AdvertisementShow(BaseModel):
     id: str

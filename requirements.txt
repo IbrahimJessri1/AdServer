@@ -8,3 +8,4 @@ passlib
 python-multipart
 requests
 jinja2
+validators
