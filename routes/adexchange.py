@@ -1,8 +1,9 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from models.ssp import Ad_Request
 from repositries import adexchange as repo_adexchange
 from models.ssp import ApplyAd
 from repositries.validation import Validator
+from fastapi.responses import HTMLResponse
 
 adexchange_router = APIRouter(
     prefix="/adexchange",
@@ -44,16 +45,16 @@ async def request(request : ApplyAd):
 
 
 
-@adexchange_router.post('/request/HTML')
-async def request(request : ApplyAd):
-    val_res = Validator.validate_ad_apply(request)
+@adexchange_router.post('/request/html', response_class=HTMLResponse)
+async def html_request(request : Request, apply_ad : ApplyAd):
+    val_res = Validator.validate_ad_apply(apply_ad)
     if val_res:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= val_res)
-    return repo_adexchange.request_html(request)
+    return repo_adexchange.html_request(request, apply_ad)
 
-@adexchange_router.post('/request_interactive/HTML')
-async def request(request : ApplyAd):
-    val_res = Validator.validate_ad_apply(request)
+@adexchange_router.post('/request_interactive/html', response_class=HTMLResponse)
+async def html_request(request : Request, apply_ad : ApplyAd):
+    val_res = Validator.validate_ad_apply(apply_ad)
     if val_res:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= val_res)
-    return repo_adexchange.request_html(request, 1)
+    return repo_adexchange.html_request(request,apply_ad, 1)

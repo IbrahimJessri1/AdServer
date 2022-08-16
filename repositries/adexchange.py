@@ -10,6 +10,9 @@ from uuid import uuid4
 from .utilites import get_weight_user_info
 from fastapi import status, HTTPException
 from config.general import HOST
+from fastapi.templating import Jinja2Templates
+
+
 
 cat_weight = 1
 keyword_weight = 1
@@ -162,23 +165,10 @@ def request(ad_apply : ApplyAd, interactive = 0):
     return data
 
 
-
-
-
-def request_html(ad_apply : ApplyAd, interactive = 0):
-    ad_collection = advertisement_collection
-    if interactive != 0:
-        ad_collection = interactive_advertisement_collection
-    ad = gen.get_one(ad_collection, {"id" : ad_apply.ad_id})
-    if (not ad) or (ad_apply.cpc > ad["marketing_info"]["max_cpc"]):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Ad For U")
-    id = str(uuid4())
-    served_ad = {"id": id, "agreed_cpc": ad_apply.cpc, "impressions": 0, "clicks" : 0, "ad_id": ad["id"], "advertiser_username" : ad["ad_info"]["advertiser_username"]}
-    served_ad_collection.insert_one(dict(served_ad))
-    data = {
-        "url" : HOST + 'serve_ad/impression/' + id,
-        "text" : ad["ad_info"]["text"]
-    }
-    if interactive != 0:
-        data["redirect_url"] = HOST + 'serve_ad/click/' + id 
-    return data
+def html_request(req, ad_apply, interactive = 0):
+    data = request(ad_apply=ad_apply, interactive=interactive)
+    data["request"] = req
+    templates = Jinja2Templates(directory="templates")
+    if interactive:
+        return templates.TemplateResponse("interactive_img_ad.html",data)
+    return templates.TemplateResponse("img_ad.html",data)

@@ -7,3 +7,4 @@ pymongo
 passlib
 python-multipart
 requests
+jinja2

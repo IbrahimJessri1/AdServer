@@ -36,7 +36,7 @@ def delete_account(username):
 
 
 
-def get(username):
+def get_my_account(username):
     try:
         res = gen.get_one(user_collection, {"username" : username})
         return UserShow(username=res["username"], role=res["role"], create_date=res["create_date"])

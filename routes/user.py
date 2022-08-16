@@ -45,6 +45,6 @@ async def delete_account(current_username : TokenData = Depends(oauth2.get_curre
 
 
 @user_router.get('/')
-async def get(current_username : TokenData = Depends(oauth2.get_current_user)):
+async def get_my_account(current_username : TokenData = Depends(oauth2.get_current_user)):
     Authorize.auth("self_get_user", current_username.username)
-    return repo_user.get(current_username.username)
+    return repo_user.get_my_account(current_username.username)
