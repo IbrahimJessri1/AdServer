@@ -6,7 +6,7 @@ from models.ssp import UserInfo
 from models.advertisement import Language, TargetAge
 from repositries import generics as gen
 import requests, os
-
+#from repositries import similarity as model
 def get_dict(obj):
     res = {}
     for att in dir(obj):
@@ -51,6 +51,7 @@ gender_weight = 1
 age_weight = 1
 language_weight = 1
 location_weight = 1
+keyword_weight = 1
 
 
 
@@ -118,3 +119,27 @@ def download_file(URL, dir, filename):
     path = dir + "/" + filename
     response = requests.get(URL)
     open(path, "wb").write(response.content)
+
+
+
+def get_kw_mark(req_keywords, ad_keywords):
+    kw_tot_marks = 0
+    kw_gained_marks = 0
+    for kw in req_keywords:
+        kw_tot_marks += keyword_weight
+        for a_kw in ad_keywords:
+            if kw.lower() in a_kw.lower():
+                kw_gained_marks += keyword_weight
+                break
+    return kw_gained_marks * 100 / kw_tot_marks
+
+
+# def get_kw_mark_sim(req_keywords, ad_keywords):
+#     sum = 0
+#     cnt = 0
+#     for kw in req_keywords:
+#         for a_kw in ad_keywords:
+#             cnt += 1
+#             sum += model.get_similarity(a_kw, kw)
+#     avg = sum / cnt
+#     return avg * 100
