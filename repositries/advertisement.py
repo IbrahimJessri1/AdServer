@@ -1,4 +1,3 @@
-from os import stat
 from uuid import uuid4
 from fastapi import HTTPException, status
 from config.db import advertisement_collection, interactive_advertisement_collection, served_ad_collection
@@ -22,13 +21,13 @@ def create_ad(ad_input, advertiser_username):
             ad_info= ad_info,
             categories=ad_input.categories
         )
-        filenames = [(AdType.TEXT, '.txt'), (AdType.IMAGE, '.jpg'), (AdType.VIDEO, '.mp4')]
-        dir = 'advertisements/' + advertiser_username
-        filename = str(advertisement.id)
-        for x in filenames:
-            if x[0] == ad_input.type:
-                filename += x[1]
-                break
+        # filenames = [(AdType.TEXT, '.txt'), (AdType.IMAGE, '.jpg'), (AdType.VIDEO, '.mp4')]
+        # dir = 'advertisements/' + advertiser_username
+        # filename = str(advertisement.id)
+        # for x in filenames:
+        #     if x[0] == ad_input.type:
+        #         filename += x[1]
+        #         break
        # download_file(advertisement.ad_info.url, dir, filename)
         d = get_dict(advertisement)
         advertisement_collection.insert_one(dict(d))

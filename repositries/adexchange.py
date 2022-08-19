@@ -1,6 +1,7 @@
 from repositries import generics as gen
-from models.ssp import Ad_Request
+from models.ssp import Ad_Request, UserInfo
 from models.users import Membership, MembershipMarks
+from models.advertisement import Language, TargetAge
 from .utilites import probability_get, rand
 from config.db import advertisement_collection, interactive_advertisement_collection, user_collection, served_ad_collection
 from models.ssp import ApplyAd
@@ -18,10 +19,13 @@ keyword_weight = 1
 user_info_weight = 10
 categories_weight = 40
 keywords_weight = 50
-ctr_weight = 0
-pay_weight = 0
-membership_weight = 0
-times_served_weight = 0
+ctr_weight = 7
+pay_weight = 7
+membership_weight = 7
+times_served_weight = 10
+
+
+
 
 def negotiate(request : Ad_Request, interactive = 0):
 
@@ -66,8 +70,6 @@ def negotiate(request : Ad_Request, interactive = 0):
         final_ad_list.append([index, 0, actual_raise])
     
     for i in range(len(all_ads)):
-        if i == 1:
-            break
         all_weights = 0
         marks = 0
         ad = all_ads[i]
@@ -87,8 +89,10 @@ def negotiate(request : Ad_Request, interactive = 0):
             all_weights += categories_weight
             marks += (cat_gained_marks * 100 / cat_tot_marks) * categories_weight
 
+
         if request.keywords:
             res = get_kw_mark(request.keywords, ad["keywords"])
+            print(res)
             all_weights += keywords_weight
             marks += res * keywords_weight
 

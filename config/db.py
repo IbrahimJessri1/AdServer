@@ -13,6 +13,8 @@ role_permission_collection = conn.AdServer.role_permission
 
 served_ad_collection = conn.AdServer.served_ad
 
+
+
 #gen.update_many(collection, {}, {"$set" : {"marketing_info.times_served" : 0} })
 
 
