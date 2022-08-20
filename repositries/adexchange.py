@@ -2,7 +2,7 @@ from repositries import generics as gen
 from models.ssp import Ad_Request, UserInfo
 from models.users import Membership, MembershipMarks
 from models.advertisement import Language, TargetAge
-from .utilites import probability_get, rand
+from .utilites import probability_get, rand, get_dict
 from config.db import advertisement_collection, interactive_advertisement_collection, user_collection, served_ad_collection
 from models.ssp import ApplyAd
 from uuid import uuid4
@@ -28,12 +28,11 @@ times_served_weight = 10
 
 
 def negotiate(request : Ad_Request, interactive = 0):
-
     ad_collection = advertisement_collection
     if interactive != 0:
         ad_collection = interactive_advertisement_collection
     adv_collection = user_collection
-    query = {"$and": [{"marketing_info.max_cpc" : {"$gt" : request.min_cpc}}, {"ad_info.type" : request.type.value}]}
+    query = {"$and": [{"$and": [{"marketing_info.max_cpc" : {"$gt" : request.min_cpc}}, {"ad_info.type" : request.type.value}]}, {"ad_info.shape" : request.shape.value}]}
     all_ads = gen.get_many(ad_collection, query)
     all_ads_advertisers = []
     for ad in all_ads:

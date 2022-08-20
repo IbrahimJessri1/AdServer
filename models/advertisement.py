@@ -39,6 +39,12 @@ class Language(str, Enum):
     EN = "en"
     AR = "ar"
 
+
+class Shape(str, Enum):
+    HORIZONTAL= "horizontal"
+    VERTICAL= "vertical"
+    RECTANGULAR= "rectangular"
+
 class TargetAge(str, Enum):
     ALL_AGES= "all ages"
     KID= "kids"
@@ -60,23 +66,15 @@ class TargetUserInfo(BaseModel):
 class AdType(str, Enum):
     IMAGE= "image"
     VIDEO= "video"
+    GIF= "gif"
 
 class AdInfo(BaseModel):
     type : AdType
     advertiser_username: str
-    url: str
     text: str
     width: int
     height: int
-
-class InteractiveAdInfo(BaseModel):
-    type : AdType
-    advertiser_username: str
-    url: str
-    redirect_url : str
-    text: str
-    width: int
-    height: int
+    shape: Shape
 
 class MarketingInfo(BaseModel):
     max_cpc : float
@@ -84,11 +82,8 @@ class MarketingInfo(BaseModel):
     raise_percentage: float
 
 
-class InteractiveMarketingInfo(BaseModel):
-    max_cpc : float
-    impressions : int
+class InteractiveMarketingInfo(MarketingInfo):
     clicks: int
-    raise_percentage: float
 
 class AdvertisementInput(BaseModel):
     target_user_info: TargetUserInfo
@@ -101,20 +96,10 @@ class AdvertisementInput(BaseModel):
     text: str
     width: int
     height: int
+    shape: Shape
 
-class InteractiveAdvertisementInput(BaseModel):
-    target_user_info: TargetUserInfo
-    max_cpc: float
-    type: AdType
-    categories: List[Category]
-    url:str
-    redirect_url:str
-    raise_percentage: float
-    keywords: Optional[List[str]] = None
-    text: str
-    width:int
-    height:int 
-
+class InteractiveAdvertisementInput(AdvertisementInput):
+    redirect_url: str
 
 class Advertisement(BaseModel):
     id:Optional[UUID] = uuid4()
@@ -123,17 +108,12 @@ class Advertisement(BaseModel):
     marketing_info: MarketingInfo
     ad_info: AdInfo
     categories: List[Category]
-    keywords: Optional[List[str]] = None
+    keywords: Optional[List[str]] = []
+    url: str
 
-class InteractiveAdvertisement(BaseModel):
-    id:Optional[UUID] = uuid4()
-    create_date: str
-    target_user_info: TargetUserInfo
+class InteractiveAdvertisement(Advertisement):
     marketing_info: InteractiveMarketingInfo
-    ad_info: InteractiveAdInfo
-    categories: List[Category]
-    keywords: Optional[List[str]] = None
-    
+    redirect_url: str
 
 class AdvertisementShow(BaseModel):
     id: str
@@ -142,17 +122,12 @@ class AdvertisementShow(BaseModel):
     marketing_info: MarketingInfo
     ad_info: AdInfo
     categories: List[Category]
-    keywords: Optional[List[str]] = None
+    keywords: Optional[List[str]] = []
+    url: str
 
-
-class InteractiveAdvertisementShow(BaseModel):
-    id: str
-    create_date: str
-    target_user_info: TargetUserInfo
+class InteractiveAdvertisementShow(AdvertisementShow):
     marketing_info: InteractiveMarketingInfo
-    ad_info: InteractiveAdInfo
-    categories: List[Category]
-    keywords: Optional[List[str]] = None
+    redirect_url: str
 
 
 class adLimitedGet(BaseModel):

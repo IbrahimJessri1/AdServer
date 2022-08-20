@@ -15,7 +15,7 @@ def redirect_impression(id):
         ad = gen.get_one(interactive_advertisement_collection, {"id": served_ad["ad_id"]})
     gen.update_one(interactive_advertisement_collection, {"id" : ad["id"]}, { "$inc": { "marketing_info.impressions": 1 } })
     gen.update_one(served_ad_collection, {"id" : id}, { "$inc": { "impressions": 1 } })
-    return ad["ad_info"]["url"]
+    return ad["url"]
 
 
 
@@ -26,4 +26,4 @@ def redirect_click(id):
     ad = gen.get_one(interactive_advertisement_collection, {"id": served_ad["ad_id"]})
     gen.update_one(interactive_advertisement_collection, {"id" : ad["id"]}, { "$inc": { "marketing_info.clicks": 1 } })
     gen.update_one(served_ad_collection, {"id" : id}, { "$inc": { "clicks": 1 } })
-    return ad["ad_info"]["redirect_url"]
+    return ad["redirect_url"]

@@ -31,7 +31,7 @@ async def create_interactive_ad(ad_input:InteractiveAdvertisementInput, current_
     val_res = Validator.validate_interactive_ad_input(ad_input)
     if val_res:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail= val_res)
-    return repo_advertisement.create_interactive_ad(ad_input, current_username.username)
+    return repo_advertisement.create_ad(ad_input, current_username.username, 1)
 
 
 
