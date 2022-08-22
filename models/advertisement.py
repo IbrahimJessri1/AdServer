@@ -93,7 +93,7 @@ class AdvertisementInput(BaseModel):
     url:str
     raise_percentage: float
     keywords: Optional[List[str]] = None
-    text: str
+    text: Optional[str] = ""
     width: int
     height: int
     shape: Shape

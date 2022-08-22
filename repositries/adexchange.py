@@ -91,7 +91,6 @@ def negotiate(request : Ad_Request, interactive = 0):
 
         if request.keywords:
             res = get_kw_mark(request.keywords, ad["keywords"])
-            print(res)
             all_weights += keywords_weight
             marks += res * keywords_weight
 
