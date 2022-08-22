@@ -22,6 +22,7 @@ served_ad_collection = conn.AdServer.served_ad
 # interactive_advertisement_collection.delete_many({})
 # served_ad_collection.delete_many({})
 
+
 #gen.update_many(collection, {}, {"$set" : {"marketing_info.times_served" : 0} })
 
 
