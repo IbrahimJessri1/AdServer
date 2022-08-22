@@ -14,6 +14,8 @@ role_permission_collection = conn.AdServer.role_permission
 served_ad_collection = conn.AdServer.served_ad
 
 
+# print(gen.get_many(interactive_advertisement_collection, {"ad_info.type" : "gif"}))
+
 # res = gen.get_many(advertisement_collection, {"adinfo.advertiser_username" : "testAdv"})
 # print(res)
 

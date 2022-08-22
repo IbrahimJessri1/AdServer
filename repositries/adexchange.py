@@ -1,12 +1,13 @@
+from tkinter import font
 from repositries import generics as gen
 from models.ssp import Ad_Request, UserInfo
 from models.users import Membership, MembershipMarks
-from models.advertisement import Language, TargetAge
-from .utilites import probability_get, rand, get_dict
+from models.advertisement import AdType, Language, TargetAge
+from .utilites import orientor, probability_get, rand, get_dict
 from config.db import advertisement_collection, interactive_advertisement_collection, user_collection, served_ad_collection
 from models.ssp import ApplyAd
 from uuid import uuid4
-from .utilites import get_weight_user_info, get_kw_mark
+from .utilites import get_weight_user_info, get_kw_mark, orientor
 from fastapi import status, HTTPException
 from config.general import HOST
 from fastapi.templating import Jinja2Templates
@@ -56,6 +57,11 @@ def negotiate(request : Ad_Request, interactive = 0):
 
     mx_times_served = 0
     mx_raise_amount = 0
+    mx_kw_mark = 0
+    mx_cat_matched = 0
+
+
+
     mx_ctr = 0
     for index in range(len(all_ads)):
         ad = all_ads[index]
@@ -66,6 +72,19 @@ def negotiate(request : Ad_Request, interactive = 0):
         mx_raise_amount = max(actual_raise, mx_raise_amount)
         if interactive and ad["marketing_info"]["impressions"] != 0:
             mx_ctr = max(mx_ctr, ad["marketing_info"]["clicks"] / ad["marketing_info"]["impressions"])
+        
+        if request.categories:
+            cat_matched = 0
+            for cat in request.categories:
+                if cat in ad["categories"]:
+                    cat_matched+= 1
+            mx_cat_matched = max(mx_cat_matched, cat_matched)
+
+        if request.keywords:
+            res = get_kw_mark(request.keywords, ad["keywords"])
+            mx_kw_mark = max(mx_kw_mark, res)
+
+
         final_ad_list.append([index, 0, actual_raise])
     
     for i in range(len(all_ads)):
@@ -79,20 +98,20 @@ def negotiate(request : Ad_Request, interactive = 0):
         cat_tot_marks = 0
         cat_gained_marks = 0
         if request.categories:
-            for cat in request.categories:
-                cat_tot_marks += cat_weight
-                if cat in ad["categories"]:
-                    cat_gained_marks += cat_weight
-
-        if cat_tot_marks != 0:
-            all_weights += categories_weight
-            marks += (cat_gained_marks * 100 / cat_tot_marks) * categories_weight
-
+            if mx_cat_matched != 0:
+                cat_matched = 0
+                for cat in request.categories:
+                    if cat in ad["categories"]:
+                        cat_matched += 1
+                if mx_cat_matched != 0:
+                    all_weights += categories_weight
+                    marks += (cat_matched * 100 / mx_cat_matched) * categories_weight
 
         if request.keywords:
-            res = get_kw_mark(request.keywords, ad["keywords"])
-            all_weights += keywords_weight
-            marks += res * keywords_weight
+            if mx_kw_mark != 0:
+                res = get_kw_mark(request.keywords, ad["keywords"])
+                all_weights += keywords_weight
+                marks += (res * 100 / mx_kw_mark) * keywords_weight
 
         if mx_times_served != 0:
             all_weights += times_served_weight
@@ -153,7 +172,8 @@ def request(ad_apply : ApplyAd, interactive = 0):
     served_ad_collection.insert_one(dict(served_ad))
     data = {
         "url" : HOST + 'serve_ad/impression/' + id,
-        "text" : ad["ad_info"]["text"]
+        "text" : ad["ad_info"]["text"],
+        "type": ad["ad_info"]["type"]
     }
     width = ad["ad_info"]["width"]
     height = ad["ad_info"]["height"]
@@ -175,8 +195,13 @@ def request(ad_apply : ApplyAd, interactive = 0):
 
     data["width"] = width
     data["height"] = height
-    data["text_font_size"] =int((13/275) * (width+height)/2)
-    data["text_margin_top"] = int((13/275) * (width+height)/2)
+    font_size = 0
+    margin_top = 0
+    if ad["ad_info"]["text"] != "":
+        font_size = int((13/275) * (width+height)/2)
+        margin_top = int((13/275) * (width+height)/2)
+    data["text_font_size"] = font_size
+    data["text_margin_top"] = margin_top
     if interactive != 0:
         data["redirect_url"] = HOST + 'serve_ad/click/' + id 
     return data
@@ -185,7 +210,8 @@ def request(ad_apply : ApplyAd, interactive = 0):
 def html_request(req, ad_apply, interactive = 0):
     data = request(ad_apply=ad_apply, interactive=interactive)
     data["request"] = req
+    path = orientor(data["type"], interactive)
     templates = Jinja2Templates(directory="templates")
-    if interactive:
-        return templates.TemplateResponse("interactive_img_ad.html",data)
-    return templates.TemplateResponse("img_ad.html",data)
+    return templates.TemplateResponse(path,data)
+
+

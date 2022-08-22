@@ -3,9 +3,10 @@ from enum import Enum
 from uuid import UUID
 import random
 from models.ssp import UserInfo
-from models.advertisement import Language, TargetAge
+from models.advertisement import Language, TargetAge, AdType
 from repositries import generics as gen
 import requests, os
+
 #from repositries import similarity as model
 def get_dict(obj):
     res = {}
@@ -143,3 +144,20 @@ def get_kw_mark(req_keywords, ad_keywords):
 #             sum += model.get_similarity(a_kw, kw)
 #     avg = sum / cnt
 #     return avg * 100
+
+
+def orientor(type : AdType, interactive):
+    if interactive:
+        if type == AdType.IMAGE:
+            return "interactive_img_ad.html"
+        if type == AdType.GIF:
+            return "interactive_img_ad.html"
+        if type == AdType.VIDEO:
+            return "interactive_video_ad.html"
+    if type == AdType.IMAGE:
+        return "img_ad.html"
+    if type == AdType.GIF:
+        return "img_ad.html"
+    if type == AdType.VIDEO:
+        return "video_ad.html"
+    
