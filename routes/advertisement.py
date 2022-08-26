@@ -36,9 +36,9 @@ async def create_interactive_ad(ad_input:InteractiveAdvertisementInput, current_
 
 
 @advertisement_router.get('/my_ads')
-async def get_my_ads(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0, interative : int = 0, type: str = 'all'):
+async def get_my_ads(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0, interactive : int = 2, type: str = 'all', shape:str = 'all'):
     Authorize.auth("self_get_ad", current_username.username)
-    return repo_advertisement.get_my_ads(username= current_username.username, limit=limit, skip=skip, interactive= interative, type=type)
+    return repo_advertisement.get_my_ads(username= current_username.username, limit=limit, skip=skip, interactive= interactive, type=type, shape=shape)
 
 
 

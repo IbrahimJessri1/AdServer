@@ -43,18 +43,30 @@ def create_ad(ad_input, advertiser_username, interactive = 0):
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail='An error happened, try again later')
 
 
-def get_my_ads(username, limit, skip, interactive, type):
-    collection = advertisement_collection
-    if interactive:
-        collection = interactive_advertisement_collection
+def get_my_ads(username, limit, skip, interactive, type, shape):
     constraints = {"ad_info.advertiser_username" : username}
     if type != 'all':
         constraints = {"$and" : [constraints, {"ad_info.type" : type}]}
-    res =  limited_get(collection=collection, limit=limit, skip=skip, constraints= constraints)
-    ads = []
-    for ad in res:
-        ads.append(toAdShow(ad, interactive))
-    return ads
+    if shape != 'all':
+        constraints = {"$and" : [constraints, {"ad_info.shape" : shape}]}
+    if interactive == 2:
+        res1 = limited_get(collection=interactive_advertisement_collection, limit=limit, skip=skip, constraints= constraints)
+        res2 = limited_get(collection=advertisement_collection, limit=limit, skip=skip, constraints= constraints)
+        ads = []
+        for ad in res1:
+            ads.append(toAdShow(ad, 1))
+        for ad in res2:
+            ads.append(toAdShow(ad, 0))
+        return ads
+    else:
+        collection = advertisement_collection
+        if interactive == 1:
+            collection = interactive_advertisement_collection
+        res =  limited_get(collection=collection, limit=limit, skip=skip, constraints= constraints)
+        ads = []
+        for ad in res:
+            ads.append(toAdShow(ad, interactive))
+        return ads
 
 
 def get_my_served_ads(username, limit, skip):

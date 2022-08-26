@@ -12,3 +12,4 @@ class ServedAd(BaseModel):
     clicks: int
     advertiser_username : str
     payment_account:str
+    create_date: str
