@@ -93,9 +93,6 @@ def remove(constraints):
     
 
 
-
-
-
 def get_ad(id, username):
     query = {"$and" : [{"ad_info.advertiser_username" : username}, {"id" : id}]}
     ad = gen.get_one(advertisement_collection, query)
