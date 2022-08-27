@@ -22,7 +22,8 @@ def create_ad(ad_input, advertiser_username, interactive = 0):
                 ad_info= ad_info,
                 categories=ad_input.categories,
                 url= ad_input.url,
-                redirect_url=ad_input.redirect_url
+                redirect_url=ad_input.redirect_url,
+                keywords=ad_input.keywords
             )
             collection = interactive_advertisement_collection
         else:
@@ -33,7 +34,8 @@ def create_ad(ad_input, advertiser_username, interactive = 0):
                 marketing_info=MarketingInfo(max_cpc= ad_input.max_cpc,impressions= 0, raise_percentage=ad_input.raise_percentage),
                 ad_info= ad_info,
                 categories=ad_input.categories,
-                url= ad_input.url
+                url= ad_input.url,
+                keywords=ad_input.keywords
             )
             collection = advertisement_collection
         ad = get_dict(advertisement)

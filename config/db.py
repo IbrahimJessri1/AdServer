@@ -2,7 +2,7 @@
 from pymongo import MongoClient
 from repositries import generics as gen
 
-
+from models.advertisement import Category
 conn = MongoClient("mongodb://localhost:27017/AdServer")
 
 
@@ -34,3 +34,9 @@ served_ad_collection = conn.AdServer.served_ad
 # advertisement_collection.delete_many({})
 # interactive_advertisement_collection.delete_many({})
 # served_ad_collection.delete_many({})
+
+
+
+# for cat in Category:
+#     res = "{label: '" + cat.value.upper() + "', value: '" + cat.value + "', alias: '" + cat.value + "'},"
+#     print(res)
