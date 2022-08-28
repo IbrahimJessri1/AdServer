@@ -168,7 +168,10 @@ def request(ad_apply : ApplyAd, interactive = 0):
     if (not ad) or (ad_apply.cpc > ad["marketing_info"]["max_cpc"]):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No Ad For U")
     id = str(uuid4())
-    served_ad = {"id": id, "agreed_cpc": ad_apply.cpc, "impressions": 0, "clicks" : 0, "ad_id": ad["id"], "advertiser_username" : ad["ad_info"]["advertiser_username"], "payment_account": ad_apply.payment_account, "create_date": str(datetime.datetime.now())}
+    clicks = 0
+    if interactive == 0:
+        clicks = -1
+    served_ad = {"id": id, "agreed_cpc": ad_apply.cpc, "impressions": 0, "clicks" : clicks, "ad_id": ad["id"], "advertiser_username" : ad["ad_info"]["advertiser_username"], "payment_account": ad_apply.payment_account, "create_date": str(datetime.datetime.now()), "charges": 0, "paid":0}
     served_ad_collection.insert_one(dict(served_ad))
     data = {
         "url" : HOST + 'serve_ad/impression/' + id,

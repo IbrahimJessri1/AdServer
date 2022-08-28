@@ -80,7 +80,8 @@ class MarketingInfo(BaseModel):
     max_cpc : float
     impressions : int
     raise_percentage: float
-
+    tot_charges: float
+    tot_paid:float
 
 class InteractiveMarketingInfo(MarketingInfo):
     clicks: int
@@ -124,6 +125,8 @@ class AdvertisementShow(BaseModel):
     categories: List[Category]
     keywords: Optional[List[str]] = []
     url: str
+    tot_charges: float
+    tot_paid:float
 
 class InteractiveAdvertisementShow(AdvertisementShow):
     marketing_info: InteractiveMarketingInfo
@@ -137,3 +140,14 @@ class adLimitedGet(BaseModel):
     constraints : Optional[dict] = {}
 
 
+class AdUpdate(BaseModel):
+    id:str
+    target_user_info: TargetUserInfo
+    max_cpc: float
+    categories: List[Category]
+    raise_percentage: float
+    keywords: Optional[List[str]] = None
+    text: Optional[str] = ""
+    width: int
+    height: int
+    shape: Shape

@@ -2,7 +2,7 @@
 from fastapi import APIRouter, UploadFile, status, HTTPException, UploadFile, File, Depends
 from repositries import oauth2
 from models.token import TokenData
-from models.advertisement import AdvertisementInput, InteractiveAdvertisementInput, adLimitedGet
+from models.advertisement import AdvertisementInput, InteractiveAdvertisementInput, adLimitedGet, AdUpdate
 from repositries import advertisement as repo_advertisement
 from repositries.validation import Validator
 from repositries.authorize import Authorize
@@ -82,8 +82,10 @@ async def get_ad(id, current_username : TokenData = Depends(oauth2.get_current_u
     return repo_advertisement.get_ad(id, current_username.username)
 
 
-
-
+@advertisement_router.put('/')
+async def update_ad(ad_update : AdUpdate, current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("self_update_ad", current_username.username)
+    return repo_advertisement.update_ad(ad_update, current_username.username)
 
 ##update_advertisement, self_update
 ##delete_advertisement, self_delete
