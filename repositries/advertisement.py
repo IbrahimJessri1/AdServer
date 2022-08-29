@@ -277,3 +277,43 @@ def pay_tot_charges(id, username):
 
     for served_ad in gen.get_many(served_ad_collection, {"ad_id" : id}):
         pay_served_ad(served_ad['id'], username)
+
+
+def get_stats(username):
+    ads = gen.get_many(advertisement_collection, {"ad_info.advertiser_username" : username}) + gen.get_many(interactive_advertisement_collection, {"ad_info.advertiser_username" : username})
+    impressions = 0
+    clicks = 0
+    paid = 0
+    charges = 0
+    gifs = 0
+    videos = 0
+    images = 0
+    interactive = 0
+    non_interactive = 0
+    for ad in ads:
+        impressions += int(ad['marketing_info']['impressions'])
+        clicks += max(int(ad['marketing_info']['clicks']), 0)
+        paid += float(ad['marketing_info']['tot_paid'])
+        charges += float(ad['marketing_info']['tot_charges'])
+        if ad['ad_info']['type'] == AdType.GIF:
+            gifs += 1
+        elif ad['ad_info']['type'] == AdType.IMAGE:
+            images += 1
+        elif ad['ad_info']['type'] == AdType.VIDEO:
+            videos += 1
+        if int(ad['marketing_info']['clicks']) == -1:
+            non_interactive += 1
+        else:
+            interactive += 1
+
+    return {
+        "impressions" : impressions,
+        "clicks" : clicks,
+        "paid" : paid,
+        "charges" : charges,
+        "gifs" : gifs,
+        "videos" : videos,
+        "images" : images,
+        "interactive" : interactive,
+        "non_interactive": non_interactive
+    }

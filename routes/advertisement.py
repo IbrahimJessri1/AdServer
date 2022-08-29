@@ -76,6 +76,15 @@ async def get_total_ad_payment(id, current_username : TokenData = Depends(oauth2
     return repo_advertisement.get_ad_payment(current_username.username, id)
 
 
+
+
+@advertisement_router.get('/get_stats')
+async def get_stats(current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("get_stats", current_username.username)
+    return repo_advertisement.get_stats(current_username.username)
+
+
+
 @advertisement_router.get('/{id}')
 async def get_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
     Authorize.auth("self_get_ad", current_username.username)
@@ -86,6 +95,9 @@ async def get_ad(id, current_username : TokenData = Depends(oauth2.get_current_u
 async def update_ad(ad_update : AdUpdate, current_username : TokenData = Depends(oauth2.get_current_user)):
     Authorize.auth("self_update_ad", current_username.username)
     return repo_advertisement.update_ad(ad_update, current_username.username)
+
+
+
 
 
 
