@@ -111,6 +111,8 @@ class Advertisement(BaseModel):
     categories: List[Category]
     keywords: Optional[List[str]] = []
     url: str
+    enabled: int
+
 
 class InteractiveAdvertisement(Advertisement):
     marketing_info: InteractiveMarketingInfo
@@ -127,6 +129,7 @@ class AdvertisementShow(BaseModel):
     url: str
     tot_charges: float
     tot_paid:float
+    enabled:int
 
 class InteractiveAdvertisementShow(AdvertisementShow):
     marketing_info: InteractiveMarketingInfo

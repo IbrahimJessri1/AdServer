@@ -14,6 +14,9 @@ role_permission_collection = conn.AdServer.role_permission
 served_ad_collection = conn.AdServer.served_ad
 
 
+
+# gen.update_one(served_ad_collection,{"paid" :{"$gte" : 0.01255}}, {"$set": {"paid":0, "charges" : 0.05255}})
+
 # print(gen.get_many(interactive_advertisement_collection, {"ad_info.type" : "gif"}))
 
 # res = gen.get_many(advertisement_collection, {"adinfo.advertiser_username" : "testAdv"})

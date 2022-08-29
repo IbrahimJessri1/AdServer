@@ -87,5 +87,24 @@ async def update_ad(ad_update : AdUpdate, current_username : TokenData = Depends
     Authorize.auth("self_update_ad", current_username.username)
     return repo_advertisement.update_ad(ad_update, current_username.username)
 
+
+
+@advertisement_router.post('/enable/{id}')
+async def update_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("self_enable_ad", current_username.username)
+    return repo_advertisement.enable_ad(id, current_username.username)
+
+
+@advertisement_router.post('/pay_tot_charges/{id}')
+async def update_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("pay_charges", current_username.username)
+    return repo_advertisement.pay_tot_charges(id, current_username.username)
+
+@advertisement_router.post('/pay/{id}')
+async def update_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
+    Authorize.auth("pay_charges", current_username.username)
+    return repo_advertisement.pay_served_ad(id, current_username.username)
+
+
 ##update_advertisement, self_update
 ##delete_advertisement, self_delete

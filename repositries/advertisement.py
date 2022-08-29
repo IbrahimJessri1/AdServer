@@ -1,4 +1,6 @@
+from gc import collect
 from hashlib import new
+from re import S
 from uuid import uuid4
 from fastapi import HTTPException, status
 from config.db import advertisement_collection, interactive_advertisement_collection, served_ad_collection
@@ -24,7 +26,8 @@ def create_ad(ad_input, advertiser_username, interactive = 0):
                 categories=ad_input.categories,
                 url= ad_input.url,
                 redirect_url=ad_input.redirect_url,
-                keywords=ad_input.keywords
+                keywords=ad_input.keywords,
+                enabled=1
             )
             collection = interactive_advertisement_collection
         else:
@@ -36,7 +39,8 @@ def create_ad(ad_input, advertiser_username, interactive = 0):
                 ad_info= ad_info,
                 categories=ad_input.categories,
                 url= ad_input.url,
-                keywords=ad_input.keywords
+                keywords=ad_input.keywords,
+                enabled=1
             )
             collection = advertisement_collection
         ad = get_dict(advertisement)
@@ -132,7 +136,8 @@ def toAdShow(ad, interactive = 0):
                     url = ad["url"],
                     redirect_url=ad["redirect_url"],
                     tot_charges=ad['marketing_info']['tot_charges'],
-                    tot_paid=ad['marketing_info']['tot_paid']
+                    tot_paid=ad['marketing_info']['tot_paid'],
+                    enabled=int(ad["enabled"])
                 )
     # try:
     return  AdvertisementShow(
@@ -145,7 +150,8 @@ def toAdShow(ad, interactive = 0):
                     keywords=ad["keywords"],
                     url = ad["url"],
                     tot_charges=ad['marketing_info']['tot_charges'],
-                    tot_paid=ad['marketing_info']['tot_paid']
+                    tot_paid=ad['marketing_info']['tot_paid'],
+                    enabled=int(ad["enabled"])
             )
     # except Exception as e:
     #     raise e
@@ -183,7 +189,7 @@ def update_ad(ad_update : AdUpdate, username):
 
 
 
-def toServedAdShow(served_ad, payment, url, type):
+def toServedAdShow(served_ad, url, type):
     return ServedAdShow(
             id=served_ad["id"],
             create_date= served_ad["create_date"],
@@ -217,3 +223,57 @@ def get_ad_payment(username, ad_id):
 
 
 
+
+def enable_ad(id, username):
+    query = {"$and" : [{"ad_info.advertiser_username" : username}, {"id" : id}]}
+    ad = gen.get_one(advertisement_collection, query)
+    if ad:
+        val = 1
+        if int(ad['enabled']) == 1:
+            val = 0
+        new_values = {"$set" : {"enabled" : val}}
+        gen.update_many(collection=advertisement_collection, query=query, new_values=new_values)
+        return
+    ad = gen.get_one(interactive_advertisement_collection, query)
+    if not ad:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ad not found")
+    val = 1
+    if int(ad['enabled']) == 1:
+        val = 0
+    new_values = {"$set" : {"enabled" : val}}
+    gen.update_one(collection=interactive_advertisement_collection, query=query, new_values=new_values)
+
+
+
+
+
+
+def pay_served_ad(id, username):
+    query = {"$and" : [{"advertiser_username" : username}, {"id" : id}]}
+    served_ad = gen.get_one(served_ad_collection, query)
+    if not served_ad:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="not found")
+    charges = float(served_ad['charges'])
+    paid = charges + float(served_ad['paid'])
+    gen.update_one(served_ad_collection, query, {"$set" : {"charges" : 0, "paid" : paid}})
+    collection = advertisement_collection
+    if int(served_ad['clicks']) != -1:
+        collection = interactive_advertisement_collection
+    ad = gen.get_one(collection=collection, constraints={'id' : served_ad['ad_id']})
+    tot_charges = round(ad['marketing_info']['tot_charges'] - charges, 8)
+    tot_paid = round(ad['marketing_info']['tot_paid'] + charges, 8)
+    new_values = {"$set" : {"marketing_info.tot_charges" : tot_charges, "marketing_info.tot_paid" : tot_paid}}
+    gen.update_one(collection=collection, query={"id" :served_ad['ad_id']}, new_values=new_values)
+    
+
+
+def pay_tot_charges(id, username):
+    query = {"$and" : [{"ad_info.advertiser_username" : username}, {"id" : id}]}
+    ad = gen.get_one(advertisement_collection, query)
+    if not ad:
+        ad = gen.get_one(interactive_advertisement_collection, query)
+        if not ad:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="ad not found")
+
+    for served_ad in gen.get_many(served_ad_collection, {"ad_id" : id}):
+        pay_served_ad(served_ad['id'], username)

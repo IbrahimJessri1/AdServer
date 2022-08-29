@@ -33,7 +33,7 @@ def negotiate(request : Ad_Request, interactive = 0):
     if interactive != 0:
         ad_collection = interactive_advertisement_collection
     adv_collection = user_collection
-    query = {"$and": [{"$and": [{"marketing_info.max_cpc" : {"$gt" : request.min_cpc}}, {"ad_info.type" : request.type.value}]}, {"ad_info.shape" : request.shape.value}]}
+    query = {"$and": [{"$and": [{"marketing_info.max_cpc" : {"$gt" : request.min_cpc}}, {"ad_info.type" : request.type.value}, {"enabled" : 1}]}, {"ad_info.shape" : request.shape.value}]}
     all_ads = gen.get_many(ad_collection, query)
     all_ads_advertisers = []
     for ad in all_ads:
