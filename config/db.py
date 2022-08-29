@@ -23,6 +23,8 @@ served_ad_collection = conn.AdServer.served_ad
 # print(res)
 
 
+
+
 # advertisement_collection.delete_many({})
 # interactive_advertisement_collection.delete_many({})
 # served_ad_collection.delete_many({})

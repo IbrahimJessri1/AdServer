@@ -66,7 +66,7 @@ class Validator:
     
     def validate_advertiser_update(advertiser_update : AdvertiserUpdate):
         msg = []
-        if len(advertiser_update.password) < 8:
+        if advertiser_update.password and len(advertiser_update.password) < 8:
             msg.append("password must have at least 8 characters")
         if msg:
             return msg

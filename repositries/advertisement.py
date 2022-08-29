@@ -292,7 +292,11 @@ def get_stats(username):
     non_interactive = 0
     for ad in ads:
         impressions += int(ad['marketing_info']['impressions'])
-        clicks += max(int(ad['marketing_info']['clicks']), 0)
+        if 'clicks' in ad['marketing_info']:
+            clicks += int(ad['marketing_info']['clicks'])
+            interactive += 1
+        else:
+            non_interactive += 1
         paid += float(ad['marketing_info']['tot_paid'])
         charges += float(ad['marketing_info']['tot_charges'])
         if ad['ad_info']['type'] == AdType.GIF:
@@ -301,10 +305,6 @@ def get_stats(username):
             images += 1
         elif ad['ad_info']['type'] == AdType.VIDEO:
             videos += 1
-        if int(ad['marketing_info']['clicks']) == -1:
-            non_interactive += 1
-        else:
-            interactive += 1
 
     return {
         "impressions" : impressions,
