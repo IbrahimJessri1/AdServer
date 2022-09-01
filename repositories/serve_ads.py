@@ -1,6 +1,6 @@
 
 from fastapi import HTTPException, status
-from repositries import generics as gen
+from repositories import generics as gen
 from config.db import interactive_advertisement_collection, advertisement_collection, served_ad_collection
 
 

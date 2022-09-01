@@ -1,5 +1,5 @@
 from tkinter import font
-from repositries import generics as gen
+from repositories import generics as gen
 from models.ssp import Ad_Request, UserInfo
 from models.users import Membership, MembershipMarks
 from models.advertisement import AdType, Language, TargetAge

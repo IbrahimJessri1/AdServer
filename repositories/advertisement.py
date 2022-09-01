@@ -5,7 +5,7 @@ from uuid import uuid4
 from fastapi import HTTPException, status
 from config.db import advertisement_collection, interactive_advertisement_collection, served_ad_collection
 from models.ads_stats import ServedAdShow
-from repositries import generics as gen
+from repositories import generics as gen
 from models.advertisement import AdInfo, AdUpdate, Advertisement, AdvertisementShow, InteractiveAdvertisementInput, MarketingInfo, InteractiveAdvertisement, InteractiveMarketingInfo, AdType, InteractiveAdvertisementShow
 import datetime
 from .utilites import get_dict, limited_get, download_file

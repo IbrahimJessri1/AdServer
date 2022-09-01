@@ -1,7 +1,7 @@
 from asyncio import constants
 from config.db import user_collection
 from models.users import UserShow
-from repositries import generics as gen
+from repositories import generics as gen
 from .utilites import limited_get
 from .hashing import Hash
 from fastapi import HTTPException, status

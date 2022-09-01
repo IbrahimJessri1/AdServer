@@ -1,10 +1,10 @@
 from fastapi import APIRouter, status, Depends, HTTPException
 from models.users import UserUpdate
-from repositries import user as repo_user
-from repositries import oauth2
+from repositories import user as repo_user
+from repositories import oauth2
 from models.token import TokenData
-from repositries.authorize import Authorize
-from repositries.validation import Validator
+from repositories.authorize import Authorize
+from repositories.validation import Validator
 
 user_router = APIRouter(
     prefix="/user",

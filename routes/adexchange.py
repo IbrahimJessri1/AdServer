@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException, status, Request
 from models.ssp import Ad_Request
-from repositries import adexchange as repo_adexchange
+from repositories import adexchange as repo_adexchange
 from models.ssp import ApplyAd
-from repositries.validation import Validator
+from repositories.validation import Validator
 from fastapi.responses import HTMLResponse
 
 adexchange_router = APIRouter(

@@ -2,7 +2,7 @@ from uuid import uuid4
 from fastapi import APIRouter, status
 from models.ssp import Ad_Request
 from models.ssp import ApplyAd
-from repositries import serve_ads as repo_serve
+from repositories import serve_ads as repo_serve
 from fastapi.responses import RedirectResponse
 from fastapi.requests import Request
 

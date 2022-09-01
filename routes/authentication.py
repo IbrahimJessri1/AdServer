@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from repositries.hashing import Hash
-from repositries import generics as gen
+from repositories.hashing import Hash
+from repositories import generics as gen
 from config.db import user_collection
 from models.token import Token
-from repositries.JWTtoken import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
+from repositories.JWTtoken import ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token
 authentication_router = APIRouter(tags=['Authentication'])
 
 

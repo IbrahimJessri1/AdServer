@@ -1,7 +1,7 @@
 from models.users import Advertiser, AdvertiserShow, Role
 from fastapi import HTTPException, status
 from config.db import user_collection
-from repositries import generics as gen
+from repositories import generics as gen
 from .hashing import Hash
 import datetime
 

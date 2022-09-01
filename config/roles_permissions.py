@@ -1,7 +1,7 @@
 
 #collection = conn.AdServer.role_permission
 from config.db import role_permission_collection
-from repositries import generics as gen
+from repositories import generics as gen
 
 admin_permission = ["get_tot_payment", "get_served_ad", "self_update_user", "update_advertisement", "delete_advertisement", "get_advertisement","delete_user","self_delete_user", "self_get_user", "get_user"]
 

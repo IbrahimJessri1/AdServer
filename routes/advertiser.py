@@ -1,11 +1,11 @@
 from fastapi import APIRouter, status, Depends, HTTPException
 from models.token import TokenData
 from models.users import Advertiser, AdvertiserUpdate
-from repositries import advertiser as repo_advertiser, generics as gen, oauth2
-from repositries.authorize import Authorize
-from repositries.validation import Validator
+from repositories import advertiser as repo_advertiser, generics as gen, oauth2
+from repositories.authorize import Authorize
+from repositories.validation import Validator
 # import time
-# from repositries import similarity as model
+# from repositories import similarity as model
 
 
 advertiser_router = APIRouter(

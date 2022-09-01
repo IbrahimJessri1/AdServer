@@ -1,11 +1,11 @@
 
 from fastapi import APIRouter, UploadFile, status, HTTPException, UploadFile, File, Depends
-from repositries import oauth2
+from repositories import oauth2
 from models.token import TokenData
 from models.advertisement import AdvertisementInput, InteractiveAdvertisementInput, adLimitedGet, AdUpdate
-from repositries import advertisement as repo_advertisement
-from repositries.validation import Validator
-from repositries.authorize import Authorize
+from repositories import advertisement as repo_advertisement
+from repositories.validation import Validator
+from repositories.authorize import Authorize
 
 advertisement_router = APIRouter(
     prefix="/advertisement",

@@ -4,10 +4,10 @@ from uuid import UUID
 import random
 from models.ssp import UserInfo
 from models.advertisement import Language, TargetAge, AdType
-from repositries import generics as gen
+from repositories import generics as gen
 import requests, os
 
-#from repositries import similarity as model
+#from repositories import similarity as model
 def get_dict(obj):
     res = {}
     for att in dir(obj):

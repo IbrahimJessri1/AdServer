@@ -1,6 +1,6 @@
 
 from pymongo import MongoClient
-from repositries import generics as gen
+from repositories import generics as gen
 
 from models.advertisement import Category
 conn = MongoClient("mongodb://localhost:27017/AdServer")
