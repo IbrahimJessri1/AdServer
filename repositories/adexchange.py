@@ -12,7 +12,7 @@ from fastapi import status, HTTPException
 from config.general import HOST
 from fastapi.templating import Jinja2Templates
 import datetime
-
+import time
 cat_weight = 1
 keyword_weight = 1
 
@@ -23,26 +23,40 @@ keywords_weight = 50
 ctr_weight = 7
 pay_weight = 7
 membership_weight = 7
-times_served_weight = 10
+times_served_weight = 3
 
 
 
 
 def negotiate(request : Ad_Request, interactive = 0):
+    t1 = time.time()
     ad_collection = advertisement_collection
     if interactive != 0:
         ad_collection = interactive_advertisement_collection
     adv_collection = user_collection
     query = {"$and": [{"$and": [{"marketing_info.max_cpc" : {"$gt" : request.min_cpc}}, {"ad_info.type" : request.type.value}, {"enabled" : 1}]}, {"ad_info.shape" : request.shape.value}]}
+    # query = {}
     all_ads = gen.get_many(ad_collection, query)
+    # print('getting all ads ', time.time() - t1)
     all_ads_advertisers = []
-    for ad in all_ads:
-        all_ads_advertisers.append(gen.get_one(adv_collection, {"username" : ad["ad_info"]["advertiser_username"]}))
 
+    adv_usernames = []
+    for ad in all_ads:
+        adv_usernames.append(ad['ad_info']['advertiser_username'])
+    adv_usernames = set(adv_usernames)
+    constraints = []
+    for un in adv_usernames:
+        constraints.append({"username" : un})
+    constraints = {"$or" : constraints}
+    all_ads_advertisers = gen.get_many(collection=adv_collection, constraints=constraints)
+    mem = {}
+    for adv in all_ads_advertisers:
+        mem[adv['username']] = adv['membership']
     for index in range(len(all_ads)):
-        if all_ads_advertisers[index]["membership"] == Membership.NORMAL:
+        membership = mem[all_ads[index]['ad_info']['advertiser_username']]
+        if membership == Membership.NORMAL:
             all_ads[index]["membership"] = Membership.NORMAL.value
-        elif all_ads_advertisers[index]["membership"] == Membership.PREMIUM:
+        elif membership == Membership.PREMIUM:
             all_ads[index]["membership"] = Membership.PREMIUM.value
         else:
             all_ads[index]["membership"] = Membership.VIP.value
@@ -60,7 +74,7 @@ def negotiate(request : Ad_Request, interactive = 0):
     mx_kw_mark = 0
     mx_cat_matched = 0
 
-
+    # print('after making all ads list ready membership ', time.time() - t1)
 
     mx_ctr = 0
     for index in range(len(all_ads)):
@@ -141,21 +155,14 @@ def negotiate(request : Ad_Request, interactive = 0):
         final_weight = 0
         if all_weights != 0:
             final_weight = marks / all_weights
-        # if ad["id"] == "17da25c1-738e-42e1-b531-3f3973d75209":
-        #     print(final_weight, " " , "gaming")
-        # if ad["id"] == "02fba90c-959e-459d-9966-7f2d24ad980d":
-        #     print(final_weight, " ", "furn")
         final_ad_list[i] = [i, final_weight, final_ad_list[i][2] + request.min_cpc]
 
     final_ad_list.sort(key= lambda x : x[1], reverse= True)
     winner_ad = all_ads[final_ad_list[0][0]]
-    #return {"cpc": final_ad_list[0][1], "ad_id": winner_ad["id"]}
-    if final_ad_list[0][1] <50:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "No Ads For U")
-    # print(final_ad_list[0])
-    # print(winner_ad)
+    # if final_ad_list[0][1] <50:
+    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "No Ads For U")
+    # print('before sending ' , time.time() - t1)
     res = {"cpc": final_ad_list[0][2], "weight":final_ad_list[0][1],  "ad_id": winner_ad["id"]}
-    print(res)
     return res
     
 
@@ -182,18 +189,18 @@ def request(ad_apply : ApplyAd, interactive = 0):
     height = ad["ad_info"]["height"]
     ratio = width / height
     if ad_apply.max_width != 0 and ad_apply.max_height == 0:
-        width = min(width, ad_apply.max_width)
+        width = ad_apply.max_width
         height = int(width / ratio)
     elif ad_apply.max_width == 0 and ad_apply.max_height != 0:
-        height = min(height, ad_apply.max_height)
+        height = ad_apply.max_height
         width = int(height * ratio)
     elif ad_apply.max_width != 0 and ad_apply.max_height != 0:
-        max_width = int(min(ad_apply.max_height, height) * ratio)
+        max_width = ad_apply.max_height * ratio
         if max_width <= ad_apply.max_width:
             width = max_width
             height = int(width / ratio)
         else:
-            height = int(min(ad_apply.max_width,width) / ratio)
+            height = ad_apply.max_width / ratio
             width = int(height * ratio)
 
     data["width"] = width

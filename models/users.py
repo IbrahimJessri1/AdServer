@@ -1,5 +1,3 @@
-from re import M
-from typing import List
 from pydantic import BaseModel
 from enum import Enum
 from typing import Optional

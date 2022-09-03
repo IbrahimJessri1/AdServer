@@ -11,7 +11,7 @@ def signup(advertiser : Advertiser):
         collection = user_collection
         user = gen.get_one(collection, {"username" : advertiser.username})
         if user:
-            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="username taken!")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="username taken!")
         advertiser.password = Hash.bcrypt(advertiser.password)
         user = dict(advertiser)
         user["role"] = Role.ADVERTISER.value

@@ -4,13 +4,13 @@ from models.ssp import Ad_Request, ApplyAd
 from models.users import Advertiser, AdvertiserUpdate, UserUpdate
 import requests, validators
 
-MAX_KEYWORDS = 20
+MAX_KEYWORDS = 10
 
 
 class Validator:
     def validate_ad_input(ad_input : AdvertisementInput):
         msg = []
-        if ad_input.max_cpc <= 0:
+        if ad_input.max_cpc <= 0.1:
             msg.append("max_cpc must be positive")
         if ad_input.raise_percentage < 0 or ad_input.raise_percentage > 1:
             msg.append("raise percentage must between 0 and 1")
