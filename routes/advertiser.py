@@ -4,9 +4,6 @@ from models.users import Advertiser, AdvertiserUpdate
 from repositories import advertiser as repo_advertiser, generics as gen, oauth2
 from repositories.authorize import Authorize
 from repositories.validation import Validator
-# import time
-# from repositories import similarity as model
-
 
 advertiser_router = APIRouter(
     prefix="/advertiser",
@@ -40,11 +37,3 @@ async def my_account(current_username : TokenData = Depends(oauth2.get_current_u
 
 
 
-
-# @advertiser_router.get('/sim')
-# async def get_sim(ph1: str, ph2: str):
-#     start = time.time()
-#     res = {'value' : float(model.get_similarity(ph1, ph2))}
-#     end = time.time()
-#     print(end - start)
-#     return res

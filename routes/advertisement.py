@@ -24,7 +24,7 @@ async def create_ad(ad_input:AdvertisementInput, current_username : TokenData = 
     return repo_advertisement.create_ad(ad_input, current_username.username)
 
 
-############ permission = create_interactive_ad
+
 @advertisement_router.post('/create_interactive_ad',  status_code=status.HTTP_201_CREATED)
 async def create_interactive_ad(ad_input:InteractiveAdvertisementInput, current_username : TokenData = Depends(oauth2.get_current_user)):
     Authorize.auth("create_interactive_ad", current_username.username)
@@ -116,7 +116,3 @@ async def update_ad(id, current_username : TokenData = Depends(oauth2.get_curren
 async def update_ad(id, current_username : TokenData = Depends(oauth2.get_current_user)):
     Authorize.auth("pay_charges", current_username.username)
     return repo_advertisement.pay_served_ad(id, current_username.username)
-
-
-##update_advertisement, self_update
-##delete_advertisement, self_delete

@@ -11,7 +11,6 @@ bert_preprocess = hub.KerasLayer(hub.load(preprocess_path))
 bert_encoder_12 = hub.KerasLayer(hub.load(bert_12_path))
 # bert_encoder_24 = hub.KerasLayer(hub.load(bert_24_path))
 
-print ("hello")
 
 def get_sentence_embeding_12(sentences):
     preprocessed_text = bert_preprocess(sentences)

@@ -1,11 +1,7 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
 from routes import advertiser, authentication, advertisement, user, adexchange, serve_ads
-from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
-
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 

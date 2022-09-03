@@ -2,7 +2,7 @@
 from models.advertisement import AdvertisementInput, InteractiveAdvertisementInput
 from models.ssp import Ad_Request, ApplyAd
 from models.users import Advertiser, AdvertiserUpdate, UserUpdate
-import requests, validators
+import validators
 
 MAX_KEYWORDS = 10
 
@@ -105,12 +105,6 @@ class Validator:
             return msg
         return False
 
-    # def validate_url(url):
-    #     try:
-    #         return requests.head(url).status_code < 400
-    #     except:
-    #         return False
 
     def validate_url(url):
-        return True
         return validators.url(url)

@@ -1,9 +1,7 @@
-from tkinter import font
 from repositories import generics as gen
-from models.ssp import Ad_Request, UserInfo
+from models.ssp import Ad_Request
 from models.users import Membership, MembershipMarks
-from models.advertisement import AdType, Language, TargetAge
-from .utilites import orientor, probability_get, rand, get_dict
+from .utilites import orientor, rand
 from config.db import advertisement_collection, interactive_advertisement_collection, user_collection, served_ad_collection
 from models.ssp import ApplyAd
 from uuid import uuid4
@@ -12,10 +10,10 @@ from fastapi import status, HTTPException
 from config.general import HOST
 from fastapi.templating import Jinja2Templates
 import datetime
-import time
+
+
 cat_weight = 1
 keyword_weight = 1
-
 
 user_info_weight = 10
 categories_weight = 40
@@ -29,15 +27,12 @@ times_served_weight = 3
 
 
 def negotiate(request : Ad_Request, interactive = 0):
-    t1 = time.time()
     ad_collection = advertisement_collection
     if interactive != 0:
         ad_collection = interactive_advertisement_collection
     adv_collection = user_collection
     query = {"$and": [{"$and": [{"marketing_info.max_cpc" : {"$gt" : request.min_cpc}}, {"ad_info.type" : request.type.value}, {"enabled" : 1}]}, {"ad_info.shape" : request.shape.value}]}
-    # query = {}
     all_ads = gen.get_many(ad_collection, query)
-    # print('getting all ads ', time.time() - t1)
     all_ads_advertisers = []
 
     adv_usernames = []
@@ -74,8 +69,6 @@ def negotiate(request : Ad_Request, interactive = 0):
     mx_kw_mark = 0
     mx_cat_matched = 0
 
-    # print('after making all ads list ready membership ', time.time() - t1)
-
     mx_ctr = 0
     for index in range(len(all_ads)):
         ad = all_ads[index]
@@ -109,8 +102,6 @@ def negotiate(request : Ad_Request, interactive = 0):
         if user_info_res != -1:
             all_weights += user_info_weight
             marks += user_info_res * user_info_weight
-        cat_tot_marks = 0
-        cat_gained_marks = 0
         if request.categories:
             if mx_cat_matched != 0:
                 cat_matched = 0
@@ -159,9 +150,6 @@ def negotiate(request : Ad_Request, interactive = 0):
 
     final_ad_list.sort(key= lambda x : x[1], reverse= True)
     winner_ad = all_ads[final_ad_list[0][0]]
-    # if final_ad_list[0][1] <50:
-    #     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "No Ads For U")
-    # print('before sending ' , time.time() - t1)
     res = {"cpc": final_ad_list[0][2], "weight":final_ad_list[0][1],  "ad_id": winner_ad["id"]}
     return res
     

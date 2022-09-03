@@ -1,14 +1,11 @@
-from gc import collect
-from hashlib import new
-from re import S
 from uuid import uuid4
 from fastapi import HTTPException, status
 from config.db import advertisement_collection, interactive_advertisement_collection, served_ad_collection
 from models.ads_stats import ServedAdShow
 from repositories import generics as gen
-from models.advertisement import AdInfo, AdUpdate, Advertisement, AdvertisementShow, InteractiveAdvertisementInput, MarketingInfo, InteractiveAdvertisement, InteractiveMarketingInfo, AdType, InteractiveAdvertisementShow
+from models.advertisement import AdInfo, AdUpdate, Advertisement, AdvertisementShow, MarketingInfo, InteractiveAdvertisement, InteractiveMarketingInfo, AdType, InteractiveAdvertisementShow
 import datetime
-from .utilites import get_dict, limited_get, download_file
+from .utilites import get_dict, limited_get
 
 
 def create_ad(ad_input, advertiser_username, interactive = 0):
@@ -95,7 +92,7 @@ def get(constraints, limit, skip, interactive):
         collection = interactive_advertisement_collection
     return limited_get(collection=collection, limit=limit, skip=skip, constraints= constraints)
 
-
+#admin uses
 def remove(constraints):
     gen.remove(advertisement_collection, constraints)
     
@@ -139,7 +136,6 @@ def toAdShow(ad, interactive = 0):
                     tot_paid=ad['marketing_info']['tot_paid'],
                     enabled=int(ad["enabled"])
                 )
-    # try:
     return  AdvertisementShow(
                     id= ad["id"],
                     create_date=ad["create_date"],
@@ -153,8 +149,6 @@ def toAdShow(ad, interactive = 0):
                     tot_paid=ad['marketing_info']['tot_paid'],
                     enabled=int(ad["enabled"])
             )
-    # except Exception as e:
-    #     raise e
 
 
 def update_ad(ad_update : AdUpdate, username):

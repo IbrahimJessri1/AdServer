@@ -12,8 +12,6 @@ user_router = APIRouter(
 )
 
 
-#create
-#update
 
 @user_router.get('/all')
 async def get(current_username : TokenData = Depends(oauth2.get_current_user), limit : int = -1, skip : int  = 0, role : str = None):
