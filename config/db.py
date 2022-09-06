@@ -12,3 +12,9 @@ user_collection = conn.AdServer.user
 role_permission_collection = conn.AdServer.role_permission
 
 served_ad_collection = conn.AdServer.served_ad
+
+# advertisement_collection.delete_many({})
+# interactive_advertisement_collection.delete_many({})
+# served_ad_collection.delete_many({})
+
+# interactive_advertisement_collection.delete_many({"ad_info.advertiser_username" : "testAdv"})

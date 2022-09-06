@@ -5,43 +5,46 @@ from .utilites import orientor, rand
 from config.db import advertisement_collection, interactive_advertisement_collection, user_collection, served_ad_collection
 from models.ssp import ApplyAd
 from uuid import uuid4
-from .utilites import get_weight_user_info, get_kw_mark, orientor
+from .utilites import get_weight_user_info, get_kw_mark, orientor, get_dict, message_formatter
 from fastapi import status, HTTPException
 from config.general import HOST
 from fastapi.templating import Jinja2Templates
 import datetime
-
+from .logger import my_logger
 
 cat_weight = 1
 keyword_weight = 1
 
-user_info_weight = 10
+user_info_weight = 12
 categories_weight = 40
-keywords_weight = 50
+keywords_weight = 47
 ctr_weight = 7
 pay_weight = 7
 membership_weight = 7
-times_served_weight = 3
+times_served_weight = 7
 
 
 
 
 def negotiate(request : Ad_Request, interactive = 0):
+    my_logger.error(message_formatter('request recieved for negotiation', str(get_dict(request))))
     ad_collection = advertisement_collection
     if interactive != 0:
         ad_collection = interactive_advertisement_collection
     adv_collection = user_collection
     query = {"$and": [{"$and": [{"marketing_info.max_cpc" : {"$gt" : request.min_cpc}}, {"ad_info.type" : request.type.value}, {"enabled" : 1}]}, {"ad_info.shape" : request.shape.value}]}
     all_ads = gen.get_many(ad_collection, query)
-    all_ads_advertisers = []
-
+    if len(all_ads) == 0:
+        my_logger.error(message_formatter('Pass, No Ads Found'))
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "No Ads For U")
     adv_usernames = []
     for ad in all_ads:
         adv_usernames.append(ad['ad_info']['advertiser_username'])
     adv_usernames = set(adv_usernames)
     constraints = []
     for un in adv_usernames:
-        constraints.append({"username" : un})
+        if {"username" : un} not in constraints:
+            constraints.append({"username" : un})
     constraints = {"$or" : constraints}
     all_ads_advertisers = gen.get_many(collection=adv_collection, constraints=constraints)
     mem = {}
@@ -56,9 +59,8 @@ def negotiate(request : Ad_Request, interactive = 0):
         else:
             all_ads[index]["membership"] = Membership.VIP.value
 
-    if len(all_ads) == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= "No Ads For U")
-   
+    
+    my_logger.error(message_formatter('ads remainning after filtering ' + str(len(all_ads))))
 
     final_ad_list = []
     
@@ -93,7 +95,6 @@ def negotiate(request : Ad_Request, interactive = 0):
 
 
         final_ad_list.append([index, 0, actual_raise])
-    
     for i in range(len(all_ads)):
         all_weights = 0
         marks = 0
@@ -147,10 +148,13 @@ def negotiate(request : Ad_Request, interactive = 0):
         if all_weights != 0:
             final_weight = marks / all_weights
         final_ad_list[i] = [i, final_weight, final_ad_list[i][2] + request.min_cpc]
-
     final_ad_list.sort(key= lambda x : x[1], reverse= True)
     winner_ad = all_ads[final_ad_list[0][0]]
     res = {"cpc": final_ad_list[0][2], "weight":final_ad_list[0][1],  "ad_id": winner_ad["id"]}
+    # if res['weight'] < 60:
+    #     my_logger.error(message_formatter('Pass, No Ads Found'))
+        # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='No Good Ad For You')
+    my_logger.error(message_formatter('best choice: AD-ID: ' + res['ad_id'] + ' - cpc: ' + str(res['cpc']) + ' - score: ' + str(res['weight'])))
     return res
     
 
@@ -183,12 +187,12 @@ def request(ad_apply : ApplyAd, interactive = 0):
         height = ad_apply.max_height
         width = int(height * ratio)
     elif ad_apply.max_width != 0 and ad_apply.max_height != 0:
-        max_width = ad_apply.max_height * ratio
+        max_width = int(ad_apply.max_height * ratio)
         if max_width <= ad_apply.max_width:
             width = max_width
             height = int(width / ratio)
         else:
-            height = ad_apply.max_width / ratio
+            height = int(ad_apply.max_width / ratio)
             width = int(height * ratio)
 
     data["width"] = width
@@ -196,8 +200,8 @@ def request(ad_apply : ApplyAd, interactive = 0):
     font_size = 0
     margin_top = 0
     if ad["ad_info"]["text"] != "":
-        font_size = int((13/275) * (width+height)/2)
-        margin_top = int((13/275) * (width+height)/2)
+        font_size = 13#int((13/275) * (width+height)/2)
+        margin_top = 13#int((13/275) * (width+height)/2)
     data["text_font_size"] = font_size
     data["text_margin_top"] = margin_top
     if interactive != 0:
@@ -210,6 +214,7 @@ def html_request(req, ad_apply, interactive = 0):
     data["request"] = req
     path = orientor(data["type"], interactive)
     templates = Jinja2Templates(directory="templates")
+    my_logger.error(message_formatter('serve ad request ID: ' + str(ad_apply.ad_id) + ' sending details..'))
     return templates.TemplateResponse(path,data)
 
 

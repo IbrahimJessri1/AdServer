@@ -6,7 +6,7 @@ from models.ssp import UserInfo
 from models.advertisement import Language, TargetAge, AdType
 from repositories import generics as gen
 import requests, os
-
+import datetime
 #from repositories import similarity as model
 def get_dict(obj):
     res = {}
@@ -161,3 +161,14 @@ def orientor(type : AdType, interactive):
     if type == AdType.VIDEO:
         return "video_ad.html"
     
+
+def get_date():
+    return str(datetime.datetime.now())
+
+
+def message_formatter(msg, content = ""):
+    res = msg + " @" + get_date()
+    if content != "":
+        res += ' #Contents: ' + content
+    return res
+
